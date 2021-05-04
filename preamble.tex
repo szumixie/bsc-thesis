@@ -1,0 +1,121 @@
+\documentclass[
+  fontsize = 12pt,
+  chapterprefix,
+  toc = bib,
+  toc = listof,
+]{scrreprt}
+\usepackage[
+  paper = a4paper,
+  margin = 2.5cm,
+  bindingoffset = 1cm,
+]{geometry}
+\linespread{1.5}
+
+\usepackage[singlespacing]{scrlayer-scrpage}
+\pagestyle{scrheadings}
+\automark{chapter}
+
+\AfterStartingTOC[toc]{\clearpage}
+\AfterTOCHead[toc]{\setcounter{page}{1}\cfoot*{}}
+
+\usepackage[tracking]{microtype}
+\usepackage{fontspec}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmonofont[Scale = MatchLowercase]{Fira Code}
+
+\usepackage{mathtools}
+\usepackage[
+  warnings-off = mathtools-overbracket,
+  warnings-off = mathtools-colon,
+]{unicode-math}
+\setmathfont{Libertinus Math}
+
+\usepackage{scrhack}
+\usepackage{minted}
+
+\usepackage{polyglossia}
+\usepackage{csquotes}
+\setdefaultlanguage[variant = canadian]{english}
+
+\usepackage[sortcites]{biblatex}
+\AtEveryBibitem{\iffieldundef{doi}{}{\clearfield{url}}}
+\addbibresource{references.bib}
+
+\usepackage{xcolor}
+\definecolor{linkcolor}{HTML}{222255}
+
+\usepackage[
+  colorlinks,
+  allcolors = linkcolor,
+]{hyperref}
+\usepackage{cleveref}
+
+\usepackage{pdfpages}
+
+\usepackage{multirow}
+\usepackage{makecell}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows}
+
+\usepackage{ebproof}
+\ebproofset{center = false}
+
+\newcommand\langkeyword[1]{\operatorname{#1}}
+\newcommand\Let{\langkeyword{let}}
+\newcommand\Univ{\langkeyword{U}}
+\newcommand\RowType{\langkeyword{Row}}
+\newcommand\RecordType{\langkeyword{Rec}}
+\newcommand\RecordLit{\langkeyword{rec}}
+
+\renewcommand\maketitle{
+  \begin{titlepage}
+    \begin{center}
+      \begin{tabular}{cc}
+        \multirow{6}{*}{\hspace{-1cm}
+          \includegraphics[width=0.25\textwidth]{files/elte-logo.eps}}
+         & \textsc{\Large\makecell{\theuniversity}}
+        \vspace{0.3cm}
+        \\ & \textsc{\Large\makecell{\thefaculty}}
+        \vspace{0.5cm}
+        \\ & \textsc{\large\makecell{\thedepartment}}
+      \end{tabular}
+
+      \vspace{5cm}
+
+      {\usekomafont{disposition}\LARGE\thetitle}
+
+      \vspace{5cm}
+
+      \begin{tabular}{lcl}
+        {\large\textit{Supervisor}:} & \hspace{4cm} & {\large\textit{Author}:}
+        \\
+        {\large\thesupervisor}       & \hspace{4cm} & {\large\theauthor}
+        \\
+        {\thesupervisorpos}          & \hspace{4cm} & {\thedegree}
+      \end{tabular}
+
+      \vfill
+
+      \textit{\thecity,
+        {\addfontfeatures{Numbers = {Proportional, Lowercase}}\theyear}}
+    \end{center}
+  \end{titlepage}
+}
+
+\newcommand\theuniversity{Eötvös Loránd University}
+\newcommand\thefaculty{Faculty of Informatics}
+\newcommand\thedepartment{Department of Programming Languages \\ and Compilers}
+\newcommand\thetitle{
+  A functional programming language \\ based on dependent type theory}
+\newcommand\thesupervisor{András Kovács}
+\newcommand\thesupervisorpos{PhD Student}
+\newcommand\theauthor{Zongpu Xie}
+\newcommand\thedegree{Computer Science BSc}
+\newcommand\thecity{Budapest}
+\newcommand\theyear{2021}
+
+\title{\thetitle}
+\author{\theauthor}
+\date{\theyear}

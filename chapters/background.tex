@@ -1,0 +1,58 @@
+\chapter{Background}\label{ch:background}
+
+\section{Functional programming}
+
+\emph{Functional programming} is the idea of structuring software by
+composing and applying functions, where mutable state and side effects are
+isolated and kept track of. The functions are similar to mathematical functions,
+they take in values as parameters and return new values based on the given
+arguments. In contrast to imperative procedues, which are defined by sequences
+of statements with side effects, function definitions are expression trees of
+functions, operators, and values~\cite{functional-Hudak, functional-Hughes}.
+
+Functions are treated just like any other values in functional languages, they
+can be given in function arguments, returned from functions, stored in data
+structures, and defined in any context~\cite{functional-Hudak, sicp}.
+
+If one defines a function that takes other functions as arguments, it is called
+a \emph{higher-order functions}. For example, \( \mathit{twice}(f, x) := f(f(x))
+\) is a higher order function, it takes a function and a value, returns a
+function applied to that value twice~\cite{functional-Hudak}. Higher-order
+functions allow one to refactor functions with similar structures by having
+parts of the definition be parameters of the new function.
+
+The ability for a function to return another function gives rise to the
+technique called \emph{currying}, where instead of having function arguments
+be given in tuples of values, the function is instead defined to have a single
+argument then directly return another function that takes another argument and
+so on~\cite{functional-Hudak, lambda-Barendregt}. For example, \( f(x)(y) \)
+is a curried function applied to two arguments.
+
+A desirable trait in functional programming is \emph{referencial transparency}.
+It allows one to replace any variable with its definition or factor out parts of
+the expressions into a new variable without changing the semantics of the
+program~\cite{functional-Hudak, functional-Hughes}. This property is lost if
+side effects are unrestricted in functions.
+
+Imperative loops need mutable variables to function, so to avoid mutable state,
+recursion is used instead in functional programming~\cite{functional-Hudak}.
+Often higher-order combinators which use recursion under the hood are used
+instead of explicit recursion, such as maps, folds, and recursion schemes, using
+them one can be sure that a particular function terminates~\cite{fold-Hutton,
+  bananas-Meijer}. With an optimizing compiler, recursive functions can be just as
+performant as imperative loops~\cite{sicp}.
+
+\section{Lambda calculus}
+
+Lambda calculus is a model of computation
+
+It is Turing-complete without types.
+
+Lambda calculus can be thought of as a minimal, stripped-down version of
+functional programming languages. It is turing complete.
+
+Types
+
+Dependent types
+
+Proofs

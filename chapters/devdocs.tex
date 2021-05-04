@@ -1,0 +1,70 @@
+\chapter{Developer documentation}\label{ch:devdocs}
+
+\section{Project structure}
+
+\input{graphs/modules.tex}
+
+\section{Raw Syntax}
+\Cref{lst:raw-adt}
+
+\begin{listing}
+  \begin{minted}{hs}
+data Term
+  = Span Span Term
+  | Var Name
+  | Hole
+  | Let Name (Maybe Term) Term Term
+  | U
+  | Pi Name (Maybe Term) Term
+  | Lam Name (Maybe Term) Term
+  | App Term Term
+  | RowType Term
+  | RowEmpty
+  | RowExt Name Term Term
+  | RecordType Term
+  | RecordEmpty
+  | RecordExt Name (Maybe Term) Term Term
+  | RecordProj Name Term
+  | RecordRestr Name Term
+  \end{minted}
+  \caption{Raw syntax \textls{ADT}}\label{lst:raw-adt}
+\end{listing}
+
+\section{Core Syntax}
+\Cref{lst:core-adt}
+
+\begin{listing}
+  \begin{minted}{hs}
+data Term
+  = Var Level
+  | Meta Meta (Maybe BoundMask)
+  | Let Name Term Term
+  | U
+  | Pi Name Term Term
+  | Lam Name Term
+  | App Term Term
+  | RowType Term
+  | RowLit (MultiMap Name Term)
+  | RowExt (MultiMap Name Term) Term
+  | RecordType Term
+  | RecordLit (MultiMap Name Term)
+  | RecordProj Name Int Term
+  | RecordAlter (MultiMapAlter Name Term) Term
+  \end{minted}
+  \caption{Core syntax \textls{ADT}}\label{lst:core-adt}
+\end{listing}
+
+\section{Parsing}
+
+The Haskell library Megaparsec is used to do both lexing and parsing at the same
+time. Megaparsec is a monadic parser combinator library.
+
+\section{Evaluation}
+
+\section{Unification}
+
+\section{Elaboration}
+
+\section{Main}
+
+\section{Testing}

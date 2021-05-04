@@ -1,0 +1,165 @@
+\chapter{User documentation}\label{ch:userdocs}
+
+\section{Installation}
+\begin{enumerate}
+  \item Install Stack~\cite{stack}.
+  \item Clone the repository:
+        \mintinline{sh}{git clone https://github.com/szumixie/unnamed.git}
+  \item Enter the directory: \mintinline{sh}{cd unnamed}.
+  \item Run \mintinline{sh}{stack install --flag unnamed:release}.
+\end{enumerate}
+
+\section{Usage}
+
+The program is a command line tool that can be called on a file as follows:
+
+\begin{minted}{sh}
+unnamed FILE
+\end{minted}
+
+\section{Lexical structure}
+
+
+
+The language is indentation sensitive, similarly to Haskell~\cite{haskell2010}.
+
+\section{Syntax}
+
+\[ \Colon= \]
+
+\section{Type system}
+
+The typing rules of the language are presented in \cref{fig:typing}.
+
+\begin{figure}
+  \begin{gather*}
+    \begin{prooftree}
+      \infer0{\Gamma, x : A \vdash x : A}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : A}
+      \hypo{\Gamma \vdash u : B[x := t]}
+      \infer2{\Gamma
+        \vdash \Let \{ x : A = t; u \} : B}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \infer0{\Gamma \vdash \Univ : \Univ}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash A : \Univ}
+      \hypo{\Gamma, x : A \vdash B : \Univ}
+      \infer2{\Gamma \vdash \forall (x : A) \to B : \Univ}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{\Gamma, x : A \vdash t : B}
+      \infer1{\Gamma \vdash \lambda x \to t : \forall (x : A) \to B}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : \forall (x : A) \to B}
+      \hypo{\Gamma \vdash u : A}
+      \infer2{\Gamma \vdash t\ u : B[x := u]}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{\Gamma \vdash A : \Univ}
+      \infer1{\Gamma \vdash \RowType A : \Univ}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \infer0{\Gamma \vdash \# \{ \} : \RowType A}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : A}
+      \hypo{\Gamma \vdash r : \RowType A}
+      \infer2{\Gamma \vdash \# \{ l : t \mid r \} : \RowType A}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{\Gamma \vdash R : \RowType \Univ}
+      \infer1{\Gamma \vdash \RecordType R : \Univ}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \infer0{\Gamma \vdash \RecordLit \{ \} : \RecordType \# \{ \}}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : A}
+      \hypo{\Gamma \vdash u : \RecordType R}
+      \infer2{\Gamma \vdash \RecordLit \{ l = t \mid u \}
+        : \RecordType \# \{ l : A \mid R \}}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : \RecordType \# \{ l : A \mid R \}}
+      \infer1{\Gamma \vdash t.l : A}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : \RecordType \# \{ l : A \mid R \}}
+      \infer1{\Gamma \vdash t\mathbin{.-}l : \RecordType R}
+    \end{prooftree}
+  \end{gather*}
+  \caption{Typing rules}\label{fig:typing}
+\end{figure}
+
+\section{Semantics}
+\Cref{fig:big-step}
+
+\begin{figure}
+  \begin{gather*}
+    \begin{prooftree}
+      \infer0{x \Downarrow x}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{u[x := t] \Downarrow u'}
+      \infer1{\Let \{ x = t; u \} \Downarrow u'}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \infer0{\Univ \Downarrow \Univ}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{A \Downarrow A'}
+      \hypo{B \Downarrow B'}
+      \infer2{\forall (x : A) \to B \Downarrow \forall (x : A') \to B'}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{t \Downarrow t'}
+      \infer1{\lambda x \to t \Downarrow \lambda x \to t'}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow \lambda x \to v}
+      \hypo{v[x := u] \Downarrow v'}
+      \infer2{t\ u \Downarrow v'}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow n}
+      \hypo{u \Downarrow u'}
+      \infer2{t\ u \Downarrow n\ u'}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{A \Downarrow A'}
+      \infer1{\RowType A \Downarrow \RowType A'}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \infer0{\# \{ \} \Downarrow \# \{ \}}
+    \end{prooftree}
+  \end{gather*}
+  \caption{Big-step}\label{fig:big-step}
+\end{figure}
+
+\section{Errors}

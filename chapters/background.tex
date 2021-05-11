@@ -15,18 +15,19 @@ can be given in function arguments, returned from functions, stored in data
 structures, and defined in any context~\cite{functional-Hudak, sicp}.
 
 If one defines a function that takes other functions as arguments, it is called
-a \emph{higher-order functions}. For example, \( \mathit{twice}(f, x) := f(f(x))
-\) is a higher order function, it takes a function and a value, returns a
-function applied to that value twice~\cite{functional-Hudak}. Higher-order
-functions allow one to refactor functions with similar structures by having
-parts of the definition be parameters of the new function.
+a \emph{higher-order functions}. For example,
+\[ \mathit{twice}(f, x) := f(f(x)) \] is a higher order function, it takes a
+function and a value, returns a function applied to that value
+twice~\cite{functional-Hudak, lambda-Revesz}. Higher-order functions allow one
+to refactor functions with similar structures by having parts of the definition
+be parameters of the new function.
 
 The ability for a function to return another function gives rise to the
-technique called \emph{currying}, where instead of having function arguments
-be given in tuples of values, the function is instead defined to have a single
+technique called \emph{currying}, where instead of having function arguments be
+given in tuples of values, the function is instead defined to have a single
 argument then directly return another function that takes another argument and
-so on~\cite{functional-Hudak, lambda-Barendregt}. For example, \( f(x)(y) \)
-is a curried function applied to two arguments.
+so on~\cite{functional-Hudak, lambda-Revesz, lambda-Barendregt}. For example,
+\[ f(x)(y) \] is a curried function applied to two arguments.
 
 A desirable trait in functional programming is \emph{referencial transparency}.
 It allows one to replace any variable with its definition or factor out parts of
@@ -44,12 +45,22 @@ performant as imperative loops~\cite{sicp}.
 
 \section{Lambda calculus}
 
-Lambda calculus is a model of computation
+\emph{Lambda calculus} is a model of computation based on mathematical
+functions, it is the basis of functional programming languages. The simplest
+untyped version only has three syntactic constructs (see
+\cref{fig:lambda-syntax}), variables, lambda abstraction, which binds variables
+and creates an anonymous function, and function application. It has a single
+rule for computation called \emph{β-reduction}, the rule is as follows:
+\[ (\lambda x.\ t)\ u \mapsto t[x \coleqq u] \]
 
-It is Turing-complete without types.
-
-Lambda calculus can be thought of as a minimal, stripped-down version of
-functional programming languages. It is turing complete.
+\begin{figure}
+  \begin{alignat*}{2}
+    t, u \Coleqq{} & x             & \qquad\text{variable}             \\
+    \alt           & \lambda x.\ t & \qquad\text{lambda abstraction}   \\
+    \alt           & t\ u          & \qquad\text{function application}
+  \end{alignat*}
+  \caption{The syntax of untyped lambda calculus}\label{fig:lambda-syntax}
+\end{figure}
 
 Types
 

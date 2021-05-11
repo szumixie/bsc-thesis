@@ -4,22 +4,37 @@
 \begin{enumerate}
   \item Install Stack~\cite{stack}.
   \item Clone the repository:
+
         \mintinline{sh}{git clone https://github.com/szumixie/unnamed.git}
+
   \item Enter the directory: \mintinline{sh}{cd unnamed}.
   \item Run \mintinline{sh}{stack install --flag unnamed:release}.
 \end{enumerate}
 
 \section{Usage}
 
-The program is a command line tool that can be called on a file as follows:
+An Unnamed program can be written in a file with any source code editor.
 
-\begin{minted}{sh}
-unnamed FILE
+Comments in the language are similar to Haskell and its derived languages.
+
+\begin{minted}{unnamed.py:UnnamedLexer -x}
+-- This is a line comment
+{- This is a
+   block comment -}
+\end{minted}
+
+Types can be defined with their church encoding
+
+\begin{minted}{unnamed.py:UnnamedLexer -x}
+Bool = ∀ {A} → A → A → A
+\end{minted}
+
+\begin{minted}{unnamed.py:UnnamedLexer -x}
+true  : Bool = λ x y → x
+false : Bool = λ x y → y
 \end{minted}
 
 \section{Lexical structure}
-
-
 
 The language is indentation sensitive, similarly to Haskell~\cite{haskell2010}.
 
@@ -34,14 +49,14 @@ The typing rules of the language are presented in \cref{fig:typing}.
 \begin{figure}
   \begin{gather*}
     \begin{prooftree}
-      \infer0{\Gamma, x : A \vdash x : A}
+      \infer0{\Gamma,\ x : A \vdash x : A}
     \end{prooftree}
     \qquad
     \begin{prooftree}
       \hypo{\Gamma \vdash t : A}
-      \hypo{\Gamma \vdash u : B[x := t]}
+      \hypo{\Gamma \vdash u : B[x \coleqq t]}
       \infer2{\Gamma
-        \vdash \Let \{ x : A = t; u \} : B}
+        \vdash \Let \{ x : A = t;\ u \} : B}
     \end{prooftree}
     \\
     \begin{prooftree}
@@ -50,19 +65,19 @@ The typing rules of the language are presented in \cref{fig:typing}.
     \qquad
     \begin{prooftree}
       \hypo{\Gamma \vdash A : \Univ}
-      \hypo{\Gamma, x : A \vdash B : \Univ}
+      \hypo{\Gamma,\ x : A \vdash B : \Univ}
       \infer2{\Gamma \vdash \forall (x : A) \to B : \Univ}
     \end{prooftree}
     \\
     \begin{prooftree}
-      \hypo{\Gamma, x : A \vdash t : B}
+      \hypo{\Gamma,\ x : A \vdash t : B}
       \infer1{\Gamma \vdash \lambda x \to t : \forall (x : A) \to B}
     \end{prooftree}
     \qquad
     \begin{prooftree}
       \hypo{\Gamma \vdash t : \forall (x : A) \to B}
       \hypo{\Gamma \vdash u : A}
-      \infer2{\Gamma \vdash t\ u : B[x := u]}
+      \infer2{\Gamma \vdash t\ u : B[x \coleqq u]}
     \end{prooftree}
     \\
     \begin{prooftree}
@@ -103,7 +118,7 @@ The typing rules of the language are presented in \cref{fig:typing}.
     \qquad
     \begin{prooftree}
       \hypo{\Gamma \vdash t : \RecordType \# \{ l : A \mid R \}}
-      \infer1{\Gamma \vdash t\mathbin{.-}l : \RecordType R}
+      \infer1{\Gamma \vdash t \RecordRestr l : \RecordType R}
     \end{prooftree}
   \end{gather*}
   \caption{Typing rules}\label{fig:typing}
@@ -119,8 +134,8 @@ The typing rules of the language are presented in \cref{fig:typing}.
     \end{prooftree}
     \qquad
     \begin{prooftree}
-      \hypo{u[x := t] \Downarrow u'}
-      \infer1{\Let \{ x = t; u \} \Downarrow u'}
+      \hypo{u[x \coleqq t] \Downarrow u'}
+      \infer1{\Let \{ x = t;\ u \} \Downarrow u'}
     \end{prooftree}
     \\
     \begin{prooftree}
@@ -140,7 +155,7 @@ The typing rules of the language are presented in \cref{fig:typing}.
     \qquad
     \begin{prooftree}
       \hypo{t \Downarrow \lambda x \to v}
-      \hypo{v[x := u] \Downarrow v'}
+      \hypo{v[x \coleqq u] \Downarrow v'}
       \infer2{t\ u \Downarrow v'}
     \end{prooftree}
     \qquad
@@ -158,8 +173,64 @@ The typing rules of the language are presented in \cref{fig:typing}.
     \begin{prooftree}
       \infer0{\# \{ \} \Downarrow \# \{ \}}
     \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow t'}
+      \hypo{r \Downarrow r'}
+      \infer2{\# \{ l : t \mid r \} \Downarrow \# \{ l : t' \mid r' \}}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{R \Downarrow R'}
+      \infer1{\RecordType R \Downarrow \RecordType R'}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \infer0{\RecordLit \{ \} \Downarrow \RecordLit \{ \}}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow t'}
+      \hypo{u \Downarrow u'}
+      \infer2{\RecordLit \{ l = t \mid u \}
+        \Downarrow \RecordLit \{ l = t' \mid u' \}}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{t \Downarrow \RecordLit \{ l = u \mid v \}}
+      \infer1{t.l \Downarrow u}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow \RecordLit \{ l' = u \mid v \}}
+      \hypo{l \neq l'}
+      \hypo{v.l \Downarrow w}
+      \infer3{t.l \Downarrow w}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow n}
+      \infer1{t.l \Downarrow n.l}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{t \Downarrow \RecordLit \{ l = u \mid v \}}
+      \infer1{t \RecordRestr l \Downarrow v}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow \RecordLit \{ l' = u \mid v \}}
+      \hypo{l \neq l'}
+      \hypo{v \RecordRestr l \Downarrow v'}
+      \infer3{t \RecordRestr l \Downarrow \RecordLit \{ l' = u \mid v' \}}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow n}
+      \infer1{t \RecordRestr l \Downarrow n \RecordRestr l}
+    \end{prooftree}
   \end{gather*}
-  \caption{Big-step}\label{fig:big-step}
+  \caption{Big-step operational semantics}\label{fig:big-step}
 \end{figure}
 
 \section{Errors}

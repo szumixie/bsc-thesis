@@ -22,7 +22,7 @@
 \usepackage{fontspec}
 \setmainfont{Libertinus Serif}
 \setsansfont{Libertinus Sans}
-\setmonofont[Scale = MatchLowercase]{Fira Code}
+\setmonofont[Scale = MatchLowercase]{Source Code Pro}
 
 \usepackage{mathtools}
 \usepackage[
@@ -62,12 +62,26 @@
 \usepackage{ebproof}
 \ebproofset{center = false}
 
-\newcommand\langkeyword[1]{\operatorname{#1}}
+\newcommand\caps[1]{\textls{\addfontfeatures{
+      Letters = Uppercase,
+      Kerning = Uppercase,
+    }#1}}
+\newcommand\oldstyle[1]{{\addfontfeatures{
+        Numbers = {Proportional, Lowercase},
+      }#1}}
+
+\newcommand\coleqq{\coloneqq}
+\newcommand\Coleqq{\mathrel{\Colon=}}
+\newcommand\alt{|\enspace}
+
+\newcommand\langkeyword[1]{\operatorname{\mathsf{#1}}}
 \newcommand\Let{\langkeyword{let}}
 \newcommand\Univ{\langkeyword{U}}
 \newcommand\RowType{\langkeyword{Row}}
 \newcommand\RecordType{\langkeyword{Rec}}
 \newcommand\RecordLit{\langkeyword{rec}}
+
+\newcommand\RecordRestr{\mathord{.-}}
 
 \renewcommand\maketitle{
   \begin{titlepage}
@@ -98,8 +112,7 @@
 
       \vfill
 
-      \textit{\thecity,
-        {\addfontfeatures{Numbers = {Proportional, Lowercase}}\theyear}}
+      \textit{\thecity, \oldstyle{\theyear}}
     \end{center}
   \end{titlepage}
 }

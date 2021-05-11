@@ -2,7 +2,16 @@
 
 \section{Project structure}
 
-\input{graphs/modules.tex}
+The project is implemented in Haskell, using the Glasgow Haskell Compiler with
+many of its extensions enabled.
+
+\Cref{fig:modules}
+
+\begin{figure}
+  \resizebox{\textwidth}{!}{\input{graphs/modules.tex}}
+  \caption{Transitively reduced dependency graph of the Haskell modules
+  }\label{fig:modules}
+\end{figure}
 
 \section{Raw Syntax}
 \Cref{lst:raw-adt}
@@ -27,7 +36,7 @@ data Term
   | RecordProj Name Term
   | RecordRestr Name Term
   \end{minted}
-  \caption{Raw syntax \textls{ADT}}\label{lst:raw-adt}
+  \caption{Raw syntax \caps{ADT}}\label{lst:raw-adt}
 \end{listing}
 
 \section{Core Syntax}

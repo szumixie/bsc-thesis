@@ -3,36 +3,40 @@
 \section{Installation}
 \begin{enumerate}
   \item Install Stack~\cite{stack}.
-  \item Clone the repository:
+  \item Clone or download the source code repository.
+  \item Enter the repository and run the following:
 
-        \mintinline{sh}{git clone https://github.com/szumixie/unnamed.git}
-
-  \item Enter the directory: \mintinline{sh}{cd unnamed}.
-  \item Run \mintinline{sh}{stack install --flag unnamed:release}.
+        \mintinline{sh}{stack install --flag unnamed:release}.
 \end{enumerate}
 
 \section{Usage}
 
 An Unnamed program can be written in a file with any source code editor.
 
-Comments in the language are similar to Haskell and its derived languages.
-
+Comments in the language are similar to Haskell and its derived languages, with
+both line comments and block comments.
 \begin{minted}{unnamed.py:UnnamedLexer -x}
 -- This is a line comment
 {- This is a
    block comment -}
 \end{minted}
 
-Types can be defined with their church encoding
-
+The identity function can be defined like so:
 \begin{minted}{unnamed.py:UnnamedLexer -x}
-Bool = ∀ {A} → A → A → A
+id = λ (A : Type)
+\end{minted}
+
+Types can be defined with their Church encoding
+\begin{minted}{unnamed.py:UnnamedLexer -x}
+Bool  : Type = ∀ (A : Type) → A → A → A
 \end{minted}
 
 \begin{minted}{unnamed.py:UnnamedLexer -x}
-true  : Bool = λ x y → x
-false : Bool = λ x y → y
+true  : Bool = λ A x y → x
+false : Bool = λ A x y → y
 \end{minted}
+
+\section{Errors}
 
 \section{Lexical structure}
 
@@ -40,7 +44,7 @@ The language is indentation sensitive, similarly to Haskell~\cite{haskell2010}.
 
 \section{Syntax}
 
-\[ \Colon= \]
+\[ \Coleqq \]
 
 \section{Type system}
 
@@ -232,5 +236,3 @@ The typing rules of the language are presented in \cref{fig:typing}.
   \end{gather*}
   \caption{Big-step operational semantics}\label{fig:big-step}
 \end{figure}
-
-\section{Errors}

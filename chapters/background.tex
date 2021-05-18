@@ -1,6 +1,6 @@
 \chapter{Background}\label{ch:background}
 
-\section{Functional programming}
+\section{Functional programming}\label{sec:functional}
 
 \emph{Functional programming} is the idea of structuring software by
 composing and applying functions, where mutable state and side effects are
@@ -16,24 +16,32 @@ structures, and defined in any context~\cite{functional-Hudak, sicp}.
 
 If one defines a function that takes other functions as arguments, it is called
 a \emph{higher-order functions}. For example,
-\[ \mathit{twice}(f, x) := f(f(x)) \] is a higher order function, it takes a
-function and a value, returns a function applied to that value
-twice~\cite{functional-Hudak, lambda-Revesz}. Higher-order functions allow one
-to refactor functions with similar structures by having parts of the definition
-be parameters of the new function.
+\begin{equation}
+  \mathit{twice}(f, x) := f(f(x))
+  \label{eq:higher-order-ex}
+\end{equation}
+is a higher order function, it takes a function and a value, returns a function
+applied to that value twice~\cite{functional-Hudak, lambda-Revesz}. Higher-order
+functions allow one to refactor functions with similar structures by having
+parts of the definition be parameters of the new function.
 
 The ability for a function to return another function gives rise to the
 technique called \emph{currying}, where instead of having function arguments be
 given in tuples of values, the function is instead defined to have a single
 argument then directly return another function that takes another argument and
-so on~\cite{functional-Hudak, lambda-Revesz, lambda-Barendregt}. For example,
-\[ f(x)(y) \] is a curried function applied to two arguments.
+so on~\cite{functional-Hudak, functional-Barendregt, lambda-Revesz}. For
+example,
+\begin{equation}
+  f(x)(y)
+  \label{eq:curry-ex}
+\end{equation}
+is a curried function applied to two arguments.
 
 A desirable trait in functional programming is \emph{referencial transparency}.
 It allows one to replace any variable with its definition or factor out parts of
 the expressions into a new variable without changing the semantics of the
-program~\cite{functional-Hudak, functional-Hughes}. This property is lost if
-side effects are unrestricted in functions.
+program~\cite{functional-Hudak, functional-Hughes, functional-Barendregt}. This
+property is lost if side effects are unrestricted in functions.
 
 Imperative loops need mutable variables to function, so to avoid mutable state,
 recursion is used instead in functional programming~\cite{functional-Hudak}.
@@ -43,26 +51,130 @@ them one can be sure that a particular function terminates~\cite{fold-Hutton,
   bananas-Meijer}. With an optimizing compiler, recursive functions can be just as
 performant as imperative loops~\cite{sicp}.
 
-\section{Lambda calculus}
+\section{Lambda calculus}\label{sec:lambda}
 
 \emph{Lambda calculus} is a model of computation based on mathematical
 functions, it is the basis of functional programming languages. The simplest
 untyped version only has three syntactic constructs (see
-\cref{fig:lambda-syntax}), variables, lambda abstraction, which binds variables
-and creates an anonymous function, and function application. It has a single
-rule for computation called \emph{β-reduction}, the rule is as follows:
-\[ (\lambda x.\ t)\ u \mapsto t[x \coleqq u] \]
+\cref{fig:lambda-syntax}). Lambda abstraction binds or captures variables and
+creates anonymous functions, those variables are \emph{bound}, variables which
+are not bound with regards to a lambda abstraction are called \emph{free
+  variables}~\cite{functional-Hudak, functional-Barendregt, lambda-Revesz,
+  lambda-Hindley}. Bound variables can be renamed without changing the behavior,
+it is called \emph{α-equivalence}~\cite{functional-Hudak, lambda-Revesz}. For
+example,
+\begin{equation}
+  (\lambda x.\ \lambda y.\ (x\ x)\ y)\ (\lambda x.\ y\ x)
+  \label{eq:lambda-ex}
+\end{equation} is a
+lambda term, which is α-equivalent to
+\begin{equation}
+  (\lambda a.\ \lambda b.\ (a\ a)\ b)\ (\lambda c.\ y\ c)
+  \label{eq:lambda-ex-rename}
+\end{equation}
+Note that the \(y\) here cannot be renamed, since it is a free variable, and
+that the \(x\)s were bound to different binders, which is why they can become
+both \(a\) and \(c\).
 
 \begin{figure}
   \begin{alignat*}{2}
     t, u \Coleqq{} & x             & \qquad\text{variable}             \\
-    \alt           & \lambda x.\ t & \qquad\text{lambda abstraction}   \\
-    \alt           & t\ u          & \qquad\text{function application}
+    \mid{}         & \lambda x.\ t & \qquad\text{lambda abstraction}   \\
+    \mid{}         & t\ u          & \qquad\text{function application}
   \end{alignat*}
   \caption{The syntax of untyped lambda calculus}\label{fig:lambda-syntax}
 \end{figure}
 
-Types
+Lambda calculus has a single rule for computation called
+\emph{β-reduction}~\cite{functional-Hudak, functional-Barendregt, lambda-Revesz,
+  lambda-Hindley, lambda-Barendregt}, the rule is as follows:
+\begin{equation}
+  (\lambda x.\ t)\ u \mapsto t[x \coleqq u]
+  \label{eq:beta}
+\end{equation}
+One needs to be careful about variable names when substituting to avoid
+accidental capture of free variables. For example, the lambda term in
+\cref{eq:lambda-ex} will become
+\begin{equation}
+  \lambda z.\ ((\lambda x.\ y\ x)\ (\lambda x.\ y\ x))\ z
+  \label{eq:lambda-ex-beta}
+\end{equation}
+after one β-reduction step. Note that the bound \(y\) is renamed to \(z\) to
+avoid clashing with the free \(y\) variable.
+
+Another concept is the \emph{η-equivalence}, which says the
+following~\cite{functional-Hudak, lambda-Revesz, lambda-Hindley,
+  lambda-Barendregt}:
+\begin{equation}
+  (\lambda x.\ f\ x) \simeq f
+\end{equation}
+where \(x\) is not a free variable in \(f\). The two sides are equated since
+they are equal after applying to an argument.
+
+Lambda terms which can be β-reduced are called \emph{reducible expression}
+(\emph{redex}), terms which do not have a redex are said to be in \emph{normal
+  form}~\cite{functional-Hudak, functional-Barendregt, lambda-Revesz,
+  lambda-Hindley, lambda-Barendregt}. At each step there can be many ways to apply
+β-reduction, but according to the Church{--}Rosser theorem, the normal forms
+after repeated reduction (if it terminates) are always equivalent regardless of
+the order of β-reduction steps, this property is called
+\emph{confluence}~\cite{functional-Hudak, lambda-Revesz, lambda-Hindley,
+  lambda-Barendregt}.
+
+There are different strategies to select which β-reduction step to take.
+Mainstream programming languages take the \emph{call-by-value} strategy, where
+one first evaluates the argument before reducing a redex, however it can lead to
+nontermination for some terms even though there is a sequence of reductions
+which lead to a normal form. Another strategy is \emph{call-by-name}, where one
+always reduces the leftmost outermost redex. This will always produce a normal
+form where it exists, however there can be redundant computations on identical
+terms~\cite{functional-Hudak}.
+
+Some lambda terms do not have normal forms at all, for example:
+\begin{equation}
+  \Omega = (\lambda x.\ x\ x)\ (\lambda x.\ x\ x)
+  \label{eq:omega}
+\end{equation}
+General recursion can also be represented, for example with the \emph{Y
+  combinator}:
+\begin{equation}
+  Y = \lambda f.\ (\lambda x.\ f\ (x\ x))\ (\lambda x.\ f\ (x\ x))
+  \label{eq:ycomb}
+\end{equation}
+however, it is inefficient in practice, so programming languages do not use it
+to implement recursion. One can show that the untyped lambda calculus is
+Turing-complete.
+
+For practical programming, data types can be encoded with lambda functions.
+There is the \emph{Church encoding}, which encodes inductive data types with
+their folds or recursor. Natural numbers can be represented by functions which
+takes a function and a constant, then using the function as the successor
+function and the constant as zero.
+
+One can use \emph{de Bruijn indices} or \emph{de Bruijn levels} to avoid
+variable names and have trivial α-equivalence. Variables are represented by
+numbers based on which accessible lambda abstraction they are bound to. De
+Bruijn indices count from the innermost lambda abstraction~\cite{debruijn},
+while de Bruijn levels count from the outermost. For example, with de Bruijn
+indices, the lambda term in \cref{eq:lambda-ex} can be written as
+\begin{equation}
+  (\lambda\ \lambda\ (1\ 1)\ 0)\ (\lambda\ 1\ 0)
+  \label{eq:lambda-ex-index}
+\end{equation}
+Note that the free \(y\) variable becomes a number outside of the range of its
+accessible lambda abstractions. Likewise, one can write the term with de Bruijn
+levels as \begin{equation}
+  (\lambda\ \lambda\ (0\ 0)\ 1)\ (\lambda\ 1\ 0)
+  \label{eq:lambda-ex-level}
+\end{equation}
+
+\section{Types}\label{sec:types}
+
+To avoid non-termination or ill behaved terms, one can add types into lambda
+calculus.
+
+The simplest typed version of lambda calculus is the \emph{simply typed lambda
+  calculus} (\emph{\caps{STLC}}).
 
 Dependent types
 

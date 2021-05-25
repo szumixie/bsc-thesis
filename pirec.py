@@ -5,11 +5,11 @@ from pygments.token import Text, Keyword, Name, String, Operator, Punctuation, C
 from pygments.lexers.haskell import HaskellLexer
 
 
-class UnnamedLexer(RegexLexer):
-    name = "Unnamed"
-    aliases = ["unnamed"]
-    filenames = ["*.unnamed"]
-    mimetypes = ["text/x-unnamed"]
+class PirecLexer(RegexLexer):
+    name = "Pirec"
+    aliases = ["pirec"]
+    filenames = ["*.pirec"]
+    mimetypes = ["text/x-pirec"]
 
     identChar = '[^\s(){};\\."]'
 
@@ -24,7 +24,7 @@ class UnnamedLexer(RegexLexer):
             (r'"', String, "string"),
             (fr"(=|:|→|->|\||:=)(?!{identChar})", Operator.Word),
             (fr"(_|let|∀|forall|λ|#|rec)(?!{identChar})", Keyword.Reserved),
-            (fr"(U|Row|Rec)(?!{identChar})", Keyword.Type),
+            (fr"(Type|Row|Rec)(?!{identChar})", Keyword.Type),
             (fr"{identChar}+", Name),
         ],
         "comment": HaskellLexer.tokens["comment"],

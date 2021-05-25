@@ -92,7 +92,7 @@
 }
 
 @book{lambda-Revesz,
-  author    = {Gy{\"{o}}rgy E. R{\'{e}}v{\'{e}}sz},
+  author    = {György E. Révész},
   title     = {Lambda-Calculus, Combinators, and Functional Programming},
   series    = {Cambridge Tracts in Theoretical Computer Science},
   volume    = {4},
@@ -128,18 +128,98 @@
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
-@article{callbyname,
-  author    = {Gordon D. Plotkin},
-  title     = {Call-by-Name, Call-by-Value and the Lambda-Calculus},
-  journal   = {Theor. Comput. Sci.},
-  volume    = {1},
-  number    = {2},
-  pages     = {125--159},
-  year      = {1975},
-  url       = {https://doi.org/10.1016/0304-3975(75)90017-1},
-  doi       = {10.1016/0304-3975(75)90017-1},
-  timestamp = {Wed, 17 Feb 2021 21:58:30 +0100},
-  biburl    = {https://dblp.org/rec/journals/tcs/Plotkin75.bib},
+@inproceedings{lambda-Sestoft,
+  author    = {Peter Sestoft},
+  editor    = {Torben Æ. Mogensen and
+               David A. Schmidt and
+               Ivan Hal Sudborough},
+  title     = {Demonstrating Lambda Calculus Reduction},
+  booktitle = {The Essence of Computation, Complexity, Analysis, Transformation.
+               Essays Dedicated to Neil D. Jones \bibbrackets{on occasion of his 60th birthday}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {2566},
+  pages     = {420--435},
+  publisher = {Springer},
+  year      = {2002},
+  url       = {https://doi.org/10.1007/3-540-36377-7_19},
+  doi       = {10.1007/3-540-36377-7_19},
+  timestamp = {Tue, 14 May 2019 10:00:52 +0200},
+  biburl    = {https://dblp.org/rec/conf/birthday/Sestoft02.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@book{lambda-Church,
+  title     = {The Calculi of Lambda Conversion \bibparens{\caps{AM}-6}},
+  isbn      = {9781400881932},
+  url       = {https://www.degruyter.com/document/doi/10.1515/9781400881932/html},
+  publisher = {Princeton University Press},
+  author    = {Church, Alonzo},
+  year      = {1985},
+  doi       = {10.1515/9781400881932}
+}
+
+@article{lambda-Turing,
+  author    = {Alan M. Turing},
+  title     = {Computability and λ-Definability},
+  journal   = {J. Symb. Log.},
+  volume    = {2},
+  number    = {4},
+  pages     = {153--163},
+  year      = {1937},
+  url       = {https://doi.org/10.2307/2268280},
+  doi       = {10.2307/2268280},
+  timestamp = {Wed, 14 Nov 2018 10:49:17 +0100},
+  biburl    = {https://dblp.org/rec/journals/jsyml/Turing37.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{churchrosser,
+  doi       = {10.1090/s0002-9947-1936-1501858-0},
+  url       = {https://doi.org/10.1090/s0002-9947-1936-1501858-0},
+  year      = 1936,
+  publisher = {American Mathematical Society \bibparens{\caps{AMS}}},
+  volume    = {39},
+  number    = {3},
+  pages     = {472--472},
+  author    = {Alonzo Church and J. Barkley Rosser},
+  title     = {Some Properties of Conversion},
+  journal   = {Transactions of the American Mathematical Society}
+}
+
+@inproceedings{callbyneed,
+  author    = {Zena M. Ariola and
+               Matthias Felleisen and
+               John Maraist and
+               Martin Odersky and
+               Philip Wadler},
+  editor    = {Ron K. Cytron and
+               Peter Lee},
+  title     = {The Call-by-Need Lambda Calculus},
+  booktitle = {Conference Record of \caps{POPL} '95: 22nd \caps{ACM SIGPLAN-SIGACT} Symposium
+               on Principles of Programming Languages, San Francisco, California,
+               \caps{USA}, January 23--25, 1995},
+  pages     = {233--246},
+  publisher = {\caps{ACM} Press},
+  year      = {1995},
+  url       = {https://doi.org/10.1145/199448.199507},
+  doi       = {10.1145/199448.199507},
+  timestamp = {Tue, 06 Nov 2018 11:07:43 +0100},
+  biburl    = {https://dblp.org/rec/conf/popl/AriolaFMOW95.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{spaceleak,
+  author    = {Neil Mitchell},
+  title     = {Leaking Space},
+  journal   = {Commun. \caps{ACM}},
+  volume    = {56},
+  number    = {11},
+  pages     = {44--52},
+  year      = {2013},
+  url       = {https://doi.org/10.1145/2524713.2524722},
+  doi       = {10.1145/2524713.2524722},
+  timestamp = {Tue, 06 Nov 2018 12:51:35 +0100},
+  biburl    = {https://dblp.org/rec/journals/cacm/Mitchell13.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
@@ -153,7 +233,112 @@
   pages     = {381--392},
   author    = {de Bruijn, N. G.},
   title     = {Lambda Calculus Notation with Nameless Dummies, a Tool for Automatic Formula Manipulation, with Application to the {Church--Rosser} Theorem},
-  journal   = {Indagationes Mathematicae (Proceedings)}
+  journal   = {Indagationes Mathematicae \bibparens{Proceedings}}
+}
+
+@book{combinator-Curry,
+  address   = {Amsterdam},
+  series    = {Studies in Logic and the Foundations of Mathematics},
+  title     = {Combinatory Logic},
+  isbn      = {9780720422085},
+  publisher = {North-Holland Pub. Co},
+  author    = {Curry, Haskell B.},
+  year      = {1958},
+  keywords  = {Combinatory logic}
+}
+
+@inproceedings{church-Koopman,
+  author    = {Pieter W. M. Koopman and
+               Rinus Plasmeijer and
+               Jan Martin Jansen},
+  editor    = {Sam Tobin{-}Hochstadt},
+  title     = {Church Encoding of Data Types Considered Harmful for Implementations:
+               Functional Pearl},
+  booktitle = {Proceedings of the 26th 2014 International Symposium on Implementation
+               and Application of Functional Languages, \caps{IFL} '14, Boston, \caps{MA}, USA,
+               October 1--3, 2014},
+  pages     = {4:1--4:12},
+  publisher = {\caps{ACM}},
+  year      = {2014},
+  url       = {https://doi.org/10.1145/2746325.2746330},
+  doi       = {10.1145/2746325.2746330},
+  timestamp = {Tue, 06 Nov 2018 11:06:43 +0100},
+  biburl    = {https://dblp.org/rec/conf/ifl/KoopmanPJ14.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{scott-Jansen,
+  author    = {Jan Martin Jansen},
+  editor    = {Peter Achten and
+               Pieter W. M. Koopman},
+  title     = {Programming in the λ-Calculus: From Church to Scott and
+               Back},
+  booktitle = {The Beauty of Functional Code -- Essays Dedicated to Rinus Plasmeijer
+               on the Occasion of His 61st Birthday},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {8106},
+  pages     = {168--180},
+  publisher = {Springer},
+  year      = {2013},
+  url       = {https://doi.org/10.1007/978-3-642-40355-2_12},
+  doi       = {10.1007/978-3-642-40355-2_12},
+  timestamp = {Tue, 14 May 2019 10:00:52 +0200},
+  biburl    = {https://dblp.org/rec/conf/birthday/Jansen13.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@book{type-Barendregt,
+  author    = {Hendrik Pieter Barendregt and
+               Wil Dekkers and
+               Richard Statman},
+  title     = {Lambda Calculus with Types},
+  series    = {Perspectives in Logic},
+  publisher = {Cambridge University Press},
+  year      = {2013},
+  url       = {http://www.cambridge.org/de/academic/subjects/mathematics/logic-categories-and-sets/lambda-calculus-types},
+  isbn      = {978-0-521-76614-2},
+  timestamp = {Wed, 12 Mar 2014 19:34:31 +0100},
+  biburl    = {https://dblp.org/rec/books/daglib/0032840.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@book{type-Pierce,
+  author    = {Benjamin C. Pierce},
+  title     = {Types and Programming Languages},
+  publisher = {\caps{MIT} Press},
+  year      = {2002},
+  isbn      = {978-0-262-16209-8},
+  timestamp = {Thu, 03 Feb 2011 10:51:35 +0100},
+  biburl    = {https://dblp.org/rec/books/daglib/0005958.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{type-Church,
+  author    = {Alonzo Church},
+  title     = {A Formulation of the Simple Theory of Types},
+  journal   = {J. Symb. Log.},
+  volume    = {5},
+  number    = {2},
+  pages     = {56--68},
+  year      = {1940},
+  url       = {https://doi.org/10.2307/2266170},
+  doi       = {10.2307/2266170},
+  timestamp = {Wed, 14 Nov 2018 10:49:18 +0100},
+  biburl    = {https://dblp.org/rec/journals/jsyml/Church40.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@book{martinloef,
+  author    = {Per Martin{-}Löf},
+  title     = {Intuitionistic Type Theory},
+  series    = {Studies in Proof Theory},
+  volume    = {1},
+  publisher = {Bibliopolis},
+  year      = {1984},
+  isbn      = {978-88-7088-228-5},
+  timestamp = {Thu, 19 Sep 2019 11:29:54 +0200},
+  biburl    = {https://dblp.org/rec/books/daglib/0000395.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
 @manual{haskell2010,
@@ -163,17 +348,26 @@
   url    = {https://www.haskell.org/onlinereport/haskell2010/}
 }
 
-@manual{stack,
-  author  = {{Stack contributors}},
-  title   = {The {Haskell} Tool {Stack}},
-  version = {2.7.1},
+@manual{ghc,
+  author  = {{\caps{GHC} Team}},
+  title   = {\caps{GHC} User's Guide},
+  version = {8.10.4},
   year    = {2021},
-  url     = {https://docs.haskellstack.org/en/v2.7.1/}
+  url     = {https://downloads.haskell.org/ghc/8.10.4/docs/html/users_guide/index.html}
+}
+
+@manual{stack,
+  author       = {{Stack contributors}},
+  title        = {The {Haskell} Tool {Stack}},
+  version      = {2.7.1},
+  organization = {Commercial Haskell \caps{SIG}},
+  year         = {2021},
+  url          = {https://docs.haskellstack.org/en/v2.7.1/}
 }
 
 @online{elabzoo,
-  author = {Andr{\'{a}}s Kov{\'{a}}cs},
-  title  = {{elaboration-zoo}},
+  author = {András Kovács},
+  title  = {Elaboration-zoo},
   year   = {2021},
   url    = {https://github.com/AndrasKovacs/elaboration-zoo/tree/dc5904b092657267ef9eda22c56c8d907ff811db}
 }
@@ -190,6 +384,23 @@
   doi       = {10.1016/0167-6423(95)00021-6},
   timestamp = {Wed, 17 Feb 2021 21:55:39 +0100},
   biburl    = {https://dblp.org/rec/journals/scp/Coquand96.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{lambdapi,
+  author    = {Andres Löh and
+               Conor McBride and
+               Wouter Swierstra},
+  title     = {A Tutorial Implementation of a Dependently Typed Lambda Calculus},
+  journal   = {Fundam. Informaticae},
+  volume    = {102},
+  number    = {2},
+  pages     = {177--207},
+  year      = {2010},
+  url       = {https://doi.org/10.3233/FI-2010-304},
+  doi       = {10.3233/FI-2010-304},
+  timestamp = {Mon, 26 Oct 2020 08:34:58 +0100},
+  biburl    = {https://dblp.org/rec/journals/fuin/LohMS10.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
@@ -218,4 +429,69 @@
   timestamp = {Wed, 20 Apr 2011 20:17:03 +0200},
   biburl    = {https://dblp.org/rec/books/daglib/0097014.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@manual{relude,
+  author       = {Dmitrii Kovanikov and Veronika Romashkina and Stephen Diehl and Serokell},
+  title        = {Relude},
+  version      = {1.0.0.1},
+  organization = {Kowainik},
+  year         = {2021},
+  url          = {http://hackage.haskell.org/package/relude-1.0.0.1}
+}
+
+@manual{optics,
+  author       = {Adam Gundry and Andres Löh and Andrzej Rybczak and Oleg Grenrus},
+  title        = {Optics},
+  version      = {0.4},
+  organization = {Well-Typed \caps{LLP}},
+  year         = {2021},
+  url          = {http://hackage.haskell.org/package/optics-0.4}
+}
+
+@manual{inotherwords,
+  author  = {Love Waern},
+  title   = {In-other-words},
+  version = {0.2.0.0},
+  year    = {2021},
+  url     = {http://hackage.haskell.org/package/in-other-words-0.2.0.0}
+}
+
+@manual{optparse,
+  author  = {Paolo Capriotti and Huw Campbell},
+  title   = {Optparse-applicative},
+  version = {0.16.1.0},
+  year    = {2020},
+  url     = {http://hackage.haskell.org/package/optparse-applicative-0.16.1.0}
+}
+
+@manual{megaparsec,
+  author  = {{Megaparsec contributors} and Paolo Martini and Daan Leijen},
+  title   = {Megaparsec},
+  version = {9.0.1},
+  year    = {2020},
+  url     = {http://hackage.haskell.org/package/megaparsec-9.0.1}
+}
+
+@article{parsing,
+  author    = {Graham Hutton and
+               Erik Meijer},
+  title     = {Monadic Parsing in {Haskell}},
+  journal   = {J. Funct. Program.},
+  volume    = {8},
+  number    = {4},
+  pages     = {437--444},
+  year      = {1998},
+  url       = {http://journals.cambridge.org/action/displayAbstract?aid=44175},
+  timestamp = {Wed, 14 Feb 2018 13:56:32 +0100},
+  biburl    = {https://dblp.org/rec/journals/jfp/HuttonM98.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@manual{prettyprinter,
+  author  = {Philip Wadler and Daan Leijen and Max Bolingbroke and Edward Kmett and David Luposchainsky},
+  title   = {Prettyprinter},
+  version = {1.7.0},
+  year    = {2020},
+  url     = {http://hackage.haskell.org/package/prettyprinter-1.7.0}
 }

@@ -40,6 +40,9 @@
 
 \usepackage[sortcites]{biblatex}
 \AtEveryBibitem{\iffieldundef{doi}{}{\clearfield{url}}}
+\setcounter{biburlnumpenalty}{9000}
+\setcounter{biburllcpenalty}{9000}
+\setcounter{biburllcpenalty}{9000}
 \addbibresource{references.bib}
 
 \usepackage{xcolor}
@@ -53,6 +56,7 @@
 
 \usepackage{pdfpages}
 
+\usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{makecell}
 
@@ -68,6 +72,9 @@
 \newcommand\oldstyle[1]{{\addfontfeatures{
         Numbers = {Proportional, Lowercase},
       }#1}}
+
+\newcommand\bibparens[1]{\textup(#1\textup)}
+\newcommand\bibbrackets[1]{\textup[#1\textup]}
 
 \newcommand\coleqq{\coloneqq}
 \newcommand\Coleqq{\mathrel{\Colon=}}

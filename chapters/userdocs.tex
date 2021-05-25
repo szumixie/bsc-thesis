@@ -1,54 +1,222 @@
 \chapter{User documentation}\label{ch:userdocs}
 
-\section{Installation}
+Pirec is a dependently typed functional language with row polymorphism and
+extensible records. It can be used to write programs without side effect and
+prove simple theorems. The program is command line tool that can type check and
+interpret Pirec programs.
+
+\section{Installation}\label{sec:install}
+
 \begin{enumerate}
   \item Install Stack~\cite{stack}.
   \item Clone or download the source code repository.
   \item Enter the repository and run the following:
-
-        \mintinline{sh}{stack install --flag unnamed:release}.
+        \begin{minted}{sh}
+stack install --flag pirec:release
+        \end{minted}
 \end{enumerate}
 
-\section{Usage}
+\section{Usage}\label{sec:usage}
 
-An Unnamed program can be written in a file with any source code editor.
+A Pirec program can be written into a file with any source code editor.
 
-Comments in the language are similar to Haskell and its derived languages, with
+Comments in Pirec are similar to Haskell and its derived languages, with
 both line comments and block comments.
-\begin{minted}{unnamed.py:UnnamedLexer -x}
+\begin{minted}{pirec.py:PirecLexer -x}
 -- This is a line comment
 {- This is a
    block comment -}
 \end{minted}
 
 The identity function can be defined like so:
-\begin{minted}{unnamed.py:UnnamedLexer -x}
-id = λ (A : Type)
+\begin{minted}{pirec.py:PirecLexer -x}
+id = λ (A : Type) → λ (a : A) → a
+\end{minted}
+It can then be applied to for example an empty record:
+\begin{minted}{pirec.py:PirecLexer -x}
+id (Rec #{}) rec{}
+\end{minted}
+where \mintinline{pirec.py:PirecLexer -x}{Rec #{}} is the type of empty records
+and \mintinline{pirec.py:PirecLexer -x}{rec{}} is an instance of an empty
+record. These two lines can be put into a file, for example into
+\texttt{id.pirec}, then run \mintinline{sh}{pirec id.pirec}. The
+program will then output the following, prettyprinting the normal form of the
+last line of the input and its inferred type:
+\begin{minted}{pirec.py:PirecLexer -x}
+rec{  }
+  : Rec #{  }
 \end{minted}
 
-Types can be defined with their Church encoding
-\begin{minted}{unnamed.py:UnnamedLexer -x}
-Bool  : Type = ∀ (A : Type) → A → A → A
+Here is another way to define the identity function:
+\begin{minted}{pirec.py:PirecLexer -x}
+id2 : ∀ (A : Type) → A → A = λ _ a → a
+\end{minted}
+The definition is given a type signature, the lambda binders are grouped
+together with a single lambda and their types are removed since they are
+optional, the unused lambda parameter is ignored with an underscore.
+
+The first parameter can be made into an implicit parameter, and its type is also
+optional:
+\begin{minted}{pirec.py:PirecLexer -x}
+id3 : ∀ {A} → A → A = λ a → a
+\end{minted}
+With this, the type of the argument does not need to be written out:
+\begin{minted}{pirec.py:PirecLexer -x}
+id3 rec{}
 \end{minted}
 
-\begin{minted}{unnamed.py:UnnamedLexer -x}
-true  : Bool = λ A x y → x
-false : Bool = λ A x y → y
+Data types can be defined with their Church encoding, for example Booleans:
+\begin{minted}{pirec.py:PirecLexer -x}
+Bool  : Type = ∀ {A} → A → A → A
+true  : Bool = λ x y → x
+false : Bool = λ x y → y
 \end{minted}
 
 \section{Errors}
 
 \section{Lexical structure}
 
-The language is indentation sensitive, similarly to Haskell~\cite{haskell2010}.
+Pirec is indentation sensitive, similarly to Haskell.
+
+\begin{table}
+  \centering
+  \begin{tabular}{@{}cc@{}}
+    \toprule
+    Unicode & \caps{ASCII} \\\midrule
+    \mintinline{pirec.py:PirecLexer -x}{→}
+            &
+    \mintinline{pirec.py:PirecLexer -x}{->}
+    \\
+    \mintinline{pirec.py:PirecLexer -x}{∀}
+            &
+    \mintinline{pirec.py:PirecLexer -x}{forall}
+    \\
+    \mintinline{pirec.py:PirecLexer -x}{λ}
+            &
+    \mintinline{pirec.py:PirecLexer -x}{\ }
+    \\\bottomrule
+  \end{tabular}
+  \caption{\caps{ASCII} alternatives to Unicode syntax}\label{tab:ascii}
+\end{table}
 
 \section{Syntax}
 
-\[ \Coleqq \]
+\begin{minted}{ebnf}
+atom = identifier | "_"
+\end{minted}
+
+\begin{figure}
+  \begin{align*}
+    \Let \{ x_1 = t_1;\ \dots;\ x_n = t_n;\ u \}
+     & \quad\mapsto\quad
+    \Let \{ x_1 = t_1;\ \dots \Let \{ x_n = t_n;\ u \} \dots \}
+    \\
+    \forall (x_1 : A_1) \dots (x_n : A_n) \to B
+     & \quad\mapsto\quad
+    \forall (x_1 : A_1) \to \dots \forall (x_n : A_n) \to B
+    \\
+    \lambda x_1 \dots x_n \to B
+     & \quad\mapsto\quad
+    \lambda x_1 \to \dots \lambda x_n \to B
+    \\
+    \# \{ l_1 : t_1;\ \dots;\ l_n : t_n \}
+     & \quad\mapsto\quad
+    \# \{ l_1 : t_1 \mid \dots \# \{ l_n : t_n \mid \# \{ \} \} \dots \}
+    \\
+    \# \{ l_1 : t_1;\ \dots;\ l_n : t_n \mid r \}
+     & \quad\mapsto\quad
+    \# \{ l_1 : t_1 \mid \dots \# \{ l_n : t_n \mid r \} \dots \}
+    \\
+    \RecordLit \{ l_1 = t_1;\ \dots;\ l_n = t_n \}
+     & \quad\mapsto\quad
+    \RecordLit \{ l_1 = t_1 \mid \dots
+    \RecordLit \{ l_n = t_n \mid \RecordLit \{ \} \} \dots \}
+    \\
+    \RecordLit \{ l_1 = t_1;\ \dots;\ l_n = t_n \mid u \}
+     & \quad\mapsto\quad
+    \RecordLit \{ l_1 = t_1 \mid \dots
+    \RecordLit \{ l_n = t_n \mid u \} \dots \}
+    \\
+    \RecordLit \{ l_1 \coleqq t_1;\ \dots;\ l_n \coleqq t_n \mid u \}
+     & \quad\mapsto\quad
+    \RecordLit \{ l_1 \coleqq t_1 \mid \dots
+    \RecordLit \{ l_n \coleqq t_n \mid u \RecordRestr l_n \}
+    \dots \RecordRestr l_1 \}
+  \end{align*}
+  \caption{Syntactic sugar in Pirec}\label{fig:sugar}
+\end{figure}
+
+\begin{figure}
+  \begin{alignat*}{2}
+    t, u, v, w, r, A, B, R \Coleqq{}
+     & x
+     & \qquad\text{variable}
+    \\
+    \mid{}
+     & \_
+     & \qquad\text{hole}
+    \\
+    \mid{}
+     & {\Let \{ x = t;\ u \}}
+     & \qquad\text{let expression}
+    \\
+    \mid{}
+     & {\Univ}
+     & \qquad\text{universe}
+    \\
+    \mid{}
+     & \forall (x : A) \to B
+     & \qquad\text{dependent function}
+    \\
+    \mid{}
+     & \lambda x \to t
+     & \qquad\text{lambda abstraction}
+    \\
+    \mid{}
+     & t\ u
+     & \qquad\text{function application}
+    \\
+    \mid{}
+     & {\RowType A}
+     & \qquad\text{row type}
+    \\
+    \mid{}
+     & \# \{ \}
+     & \qquad\text{empty row}
+    \\
+    \mid{}
+     & \# \{ l : t \mid r \}
+     & \qquad\text{row extension}
+    \\
+    \mid{}
+     & {\RecordType R}
+     & \qquad\text{record type}
+    \\
+    \mid{}
+     & {\RecordLit \{ \}}
+     & \qquad\text{empty record}
+    \\
+    \mid{}
+     & {\RecordLit \{ l = t \mid u \}}
+     & \qquad\text{record extension}
+    \\
+    \mid{}
+     & t.l
+     & \qquad\text{record projection}
+    \\
+    \mid{}
+     & t \RecordRestr l
+     & \qquad\text{record restriction}
+  \end{alignat*}
+  \caption{The desugared terms of Pirec}\label{fig:term}
+\end{figure}
 
 \section{Type system}
 
-The typing rules of the language are presented in \cref{fig:typing}.
+The typing rules of Pirec are presented in \cref{fig:typing} without implicit
+arguments.
+
+~\cite{scopedlabels}
 
 \begin{figure}
   \begin{gather*}
@@ -60,7 +228,7 @@ The typing rules of the language are presented in \cref{fig:typing}.
       \hypo{\Gamma \vdash t : A}
       \hypo{\Gamma \vdash u : B[x \coleqq t]}
       \infer2{\Gamma
-        \vdash \Let \{ x : A = t;\ u \} : B}
+        \vdash \Let \{ x = t;\ u \} : B}
     \end{prooftree}
     \\
     \begin{prooftree}
@@ -125,11 +293,29 @@ The typing rules of the language are presented in \cref{fig:typing}.
       \infer1{\Gamma \vdash t \RecordRestr l : \RecordType R}
     \end{prooftree}
   \end{gather*}
-  \caption{Typing rules}\label{fig:typing}
+  \caption{The typing rules of Pirec}\label{fig:typing}
 \end{figure}
 
 \section{Semantics}
 \Cref{fig:big-step}
+
+\begin{figure}
+  \begin{alignat*}{2}
+    n \Coleqq{} & x
+                & \qquad\text{variable}             \\
+    \mid{}      & n\ t
+                & \qquad\text{function application} \\
+    \mid{}      & \# \{ l : t \mid n \}
+                & \qquad\text{row extension}        \\
+    \mid{}      & {\RecordLit \{ l = t \mid n \}}
+                & \qquad\text{record extension}     \\
+    \mid{}      & n.l
+                & \qquad\text{record projection}    \\
+    \mid{}      & n \RecordRestr l
+                & \qquad\text{record restriction}
+  \end{alignat*}
+  \caption{The neutral terms of Pirec}\label{fig:neutral}
+\end{figure}
 
 \begin{figure}
   \begin{gather*}
@@ -234,5 +420,5 @@ The typing rules of the language are presented in \cref{fig:typing}.
       \infer1{t \RecordRestr l \Downarrow n \RecordRestr l}
     \end{prooftree}
   \end{gather*}
-  \caption{Big-step operational semantics}\label{fig:big-step}
+  \caption{The big-step operational semantics of Pirec}\label{fig:big-step}
 \end{figure}

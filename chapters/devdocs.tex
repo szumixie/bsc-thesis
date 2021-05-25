@@ -2,12 +2,15 @@
 
 \section{Project structure}
 
-The project is implemented in Haskell, using the Glasgow Haskell Compiler with
-many of its extensions enabled.
+The project is implemented in Haskell~\cite{haskell2010}, using the
+\emph{Glasgow Haskell Compiler} (\caps{GHC}) with many of its extensions
+enabled~\cite{ghc}.
 
 Stack~\cite{stack} is used to manage the project and its dependencies.
 
-Algorithm ideas are taken from~\cite{elabzoo}.
+Project structure and algorithm ideas are from~\cite{elabzoo}.
+
+~\cite{relude}
 
 \Cref{fig:modules}
 
@@ -16,6 +19,10 @@ Algorithm ideas are taken from~\cite{elabzoo}.
   \caption{Transitively reduced dependency graph of the Haskell modules
   }\label{fig:modules}
 \end{figure}
+
+\section{?}
+
+~\cite{funcdata, optics, inotherwords, prettyprinter}
 
 \section{Raw Syntax}
 \Cref{lst:raw-adt}
@@ -27,18 +34,18 @@ data Term
   | Var Name
   | Hole
   | Let Name (Maybe Term) Term Term
-  | U
-  | Pi Name (Maybe Term) Term
-  | Lam Name (Maybe Term) Term
-  | App Term Term
+  | Univ
+  | Pi Plicity Name (Maybe Term) Term
+  | Lam Plicity Name (Maybe Term) Term
+  | App Plicity Term Term
   | RowType Term
   | RowEmpty
-  | RowExt Name Term Term
+  | RowExt Label Term Term
   | RecordType Term
   | RecordEmpty
-  | RecordExt Name (Maybe Term) Term Term
-  | RecordProj Name Term
-  | RecordRestr Name Term
+  | RecordExt Label (Maybe Term) Term Term
+  | RecordProj Label Term
+  | RecordRestr Label Term
   \end{minted}
   \caption{Raw syntax \caps{ADT}}\label{lst:raw-adt}
 \end{listing}
@@ -52,36 +59,40 @@ data Term
   = Var Level
   | Meta Meta (Maybe BoundMask)
   | Let Name Term Term
-  | U
-  | Pi Name Term Term
-  | Lam Name Term
-  | App Term Term
+  | Univ
+  | Pi Plicity Name Term Term
+  | Lam Plicity Name Term
+  | App Plicity Term Term
   | RowType Term
-  | RowLit (MultiMap Name Term)
-  | RowExt (MultiMap Name Term) Term
+  | RowLit (MultiMap Label Term)
+  | RowExt (MultiMap Label Term) Term
   | RecordType Term
-  | RecordLit (MultiMap Name Term)
-  | RecordProj Name Int Term
-  | RecordAlter (MultiMapAlter Name Term) Term
+  | RecordLit (MultiMap Label Term)
+  | RecordProj Label Int Term
+  | RecordAlter (MultiMapAlter Label Term) Term
   \end{minted}
   \caption{Core syntax \textls{ADT}}\label{lst:core-adt}
 \end{listing}
 
 \section{Parsing}
 
-The Haskell library Megaparsec is used to do both lexing and parsing at the same
-time. Megaparsec is a monadic parser combinator library.
+The Haskell library Megaparsec~\cite{megaparsec} is used to do both lexing and
+parsing at the same time. Megaparsec is a monadic parser combinator
+library~\cite{parsing}.
 
 \section{Evaluation}
 
-Evaluating to normal form is done with normalization-by-evaluation (\caps{NBE})
+\emph{Normalization-by-evaluation} (\caps{NBE}) with explicit closures is
+implemented to evaluate lambda terms to normal form.
 
 \section{Unification}
 
 \section{Elaboration}
 
-Bidirectional type-checking algorithm is used.
+Bidirectional type-checking algorithm is used~\cite{deptypecheck, lambdapi}.
 
 \section{Main}
+
+~\cite{optparse}
 
 \section{Testing}

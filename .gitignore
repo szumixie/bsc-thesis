@@ -291,3 +291,6 @@ TSWLatexianTemp*
 
 # glossaries
 *.glstex
+
+# Visual Studio Code
+.vscode

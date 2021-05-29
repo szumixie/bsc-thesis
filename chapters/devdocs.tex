@@ -1,18 +1,37 @@
 \chapter{Developer documentation}\label{ch:devdocs}
 
-\section{Project structure}
+\section{Project structure}\label{sec:project}
 
-The project is implemented in Haskell~\cite{haskell2010}, using the
-\emph{Glasgow Haskell Compiler} (\caps{GHC}) with many of its extensions
-enabled~\cite{ghc}.
+The project is implemented in \emph{Haskell}~\cite{haskell2010}, using
+\emph{Glasgow Haskell Compiler} (\caps{GHC}) version~8.10.4~\cite{ghc} with most
+warnings and extensions enabled by default, notable extensions include:
+\begin{description}
+  \item[NoImplicitPrelude] To not have the default standard library imported
+    implicitly in every module, instead using Relude (see below).
+  \item[Derive\(*\)] To derive many type classes automatically, for example
+    every type has automatically derived \mintinline{hs}{Show} instance where
+    possible for debugging purposes.
+  \item[TemplateHaskell] To enable automatic optics generation using
+    metaprogramming (see \cref{ssec:optics}).
+  \item[OverloadedLabels] To use the automatically generated optics with shorter
+    syntax, a hash character followed by the record field name.
+  \item[StrictData] To have data type definitions be strict to improve
+    performance and avoid space leaks~\cite{spaceleak}.
+\end{description}
 
-Stack~\cite{stack} is used to manage the project and its dependencies.
+the project and its dependencies are managed by \emph{Stack}~\cite{stack}, with
+package description written in the \emph{Hpack} format~\cite{hpack}. Continuous
+integration is setup using \emph{GitHub Actions}~\cite{actions} with actions
+provided from~\cite{actions-Haskell} to setup Stack.
 
-Project structure and algorithm ideas are from~\cite{elabzoo}.
+An alternate Haskell standard library (\enquote{prelude}) called
+\emph{Relude}~\cite{relude} is used, and it is imported in every module. The
+source code is checked with \emph{Hlint}~\cite{hlint} with rules provided by
+Relude and formatted with \emph{Fourmolu}~\cite{fourmolu} with indentation size
+of two spaces.
 
-~\cite{relude}
-
-\Cref{fig:modules}
+Many ideas about the project and the algorithms are from~\cite{elabzoo}. The
+module dependencies of the project are shown in \cref{fig:modules}.
 
 \begin{figure}
   \resizebox{\textwidth}{!}{\input{graphs/modules.tex}}
@@ -20,38 +39,107 @@ Project structure and algorithm ideas are from~\cite{elabzoo}.
   }\label{fig:modules}
 \end{figure}
 
-\section{?}
+To build the project, run \mintinline{text}{stack build} inside the repository,
+to run the tests, run \mintinline{text}{stack test}, automatically generated
+documentation with the types of exported functions can be generated with
+\mintinline{text}{stack haddock}
 
-~\cite{funcdata, optics, inotherwords, prettyprinter}
+\subsection{Optics}\label{ssec:optics}
 
-\section{Raw Syntax}
-\Cref{lst:raw-adt}
+The project makes active use of lenses and optics using the \emph{Optics}
+library~\cite{optics} in Haskell.
+
+\emph{Lenses} or \emph{functional references} were originally an abstraction to
+help update nested data types~\cite{viewupdate}, then an encoding using functors
+was discovered and other variations of lenses were found~\cite{vanlaarhoven,
+  lens}, these collectively are known as \emph{optics}. The Optics library is
+based on a more principled profunctor encoding~\cite{profunctor}, it has an
+abstract interface, and it can automatically generate lenses using
+TemplateHaskell which can be used with overloaded labels~\cite{optics}.
+
+\subsection{Effect system}\label{ssec:effect}
+
+For functions with effects, the project makes use of an higher-order effect
+system library called \emph{in-other-words}~\cite{inotherwords}.
+
+Monads are a way to manage and reason about computational effects, however
+defining a different monad for each combination of effects is not modular. Monad
+transformers are a way to combine effects together in a modular way by stacking
+types~\cite{transformers}, and type classes can be used to have fine-grained
+control over the effects and to have multiple ways of interpreting effects, it
+is implemented by the \emph{\caps{MTL}} library~\cite{mtl}. However, it has some
+limitation such as there cannot be multiple variants of the same effect, or that
+defining a new transformer requires writing \(O(n^2)\) amount of instances where
+\(n\) is the amount of existing transformers~\cite{effect}.
+
+\emph{Extensible effects} are an alternative to monad transformers without the
+limitations~\cite{extensible}, Haskell libraries usually use a version of free
+monads. Usually one can only define first-order effects~\cite{freersimple}, but
+there are higher-order effect systems~\cite{fusedeffects, polysemy} using the
+methods in~\cite{effectscope}. Unfortunately this approach has some semantic
+issues~\cite{polysemy-nondet}, which is what the in-other-words library aims to
+solve~\cite{inotherwords}.
+
+The performance of using an effect system is suboptimal, though there are
+efforts to improve on that~\cite{eff, ghcdelim}
+
+\section{Raw Syntax}\label{sec:raw}
+
+The raw syntax is the unprocessed \caps{AST} after desugaring, it is represented
+as a recursive \caps{ADT} with many constructors defined at
+\texttt{Pirec.Syntax.Raw} (see \cref{lst:raw-adt}).
 
 \begin{listing}
   \begin{minted}{hs}
 data Term
   = Span Span Term
-  | Var Name
-  | Hole
-  | Let Name (Maybe Term) Term Term
-  | Univ
-  | Pi Plicity Name (Maybe Term) Term
-  | Lam Plicity Name (Maybe Term) Term
-  | App Plicity Term Term
-  | RowType Term
-  | RowEmpty
-  | RowExt Label Term Term
-  | RecordType Term
-  | RecordEmpty
-  | RecordExt Label (Maybe Term) Term Term
-  | RecordProj Label Term
-  | RecordRestr Label Term
+  | Var Name                               -- x
+  | Hole                                   -- _
+  | Let Name (Maybe Term) Term Term        -- let{ x : a = t; u }
+  | Univ                                   -- Type
+  | Pi Plicity Name (Maybe Term) Term      -- ∀ (x : A) → B
+  | Lam Plicity Name (Maybe Term) Term     -- λ (x : A) → t
+  | App Plicity Term Term                  -- t u
+  | Sigma Name (Maybe Term) Term           -- ∃ (x : A) × B
+  | Pair Term Term                         -- t , u
+  | Proj1 Term                             -- proj1 t
+  | Proj2 Term                             -- proj2 t
+  | RowType Term                           -- Row t
+  | RowEmpty                               -- #{}
+  | RowExt Label Term Term                 -- #{ l : t; r }
+  | RecordType Term                        -- Rec R
+  | RecordEmpty                            -- rec{}
+  | RecordExt Label (Maybe Term) Term Term -- rec{ l : a = t; u }
+  | RecordProj Label Term                  -- t.l
+  | RecordRestr Label Term                 -- t.-l
   \end{minted}
   \caption{Raw syntax \caps{ADT}}\label{lst:raw-adt}
 \end{listing}
 
-\section{Core Syntax}
-\Cref{lst:core-adt}
+The \mintinline{hs}{Span} constructor denotes the range of characters the term
+spans, the type \mintinline{hs}{Span} stores the starting and ending offset
+in the source code, it is defined at \texttt{Pirec.Data.Span}. Every other
+contructor correspond to a syntactic construct in \cref{fig:term}.
+
+The type \mintinline{hs}{Name} represents a variable name, it is a newtype over
+the the type \mintinline{hs}{ShortText} defined at \texttt{Pirec.Var.Name} which
+is a compact \caps{UTF}-8 string~\cite{shorttext}. Wildcard binders are
+represented with the name of a single underscore, a pattern synonym is defined
+for it as \mintinline{hs}{Wildcard}. \mintinline{hs}{Label} represents a row or
+record field label, it has the same representation as \mintinline{hs}{Name}, but
+it is a different type for type safety, it is defined at \texttt{Pirec.Label}.
+
+The constructors related to dependent functions have a field with type
+\mintinline{hs}{Plicity} defined at \texttt{Pirec.Plicity}, it denotes whether
+the argument is implict, it has two possible values, \mintinline{hs}{Explicit}
+and \mintinline{hs}{Implicit}. The fields with type \mintinline{hs}{Maybe Term}
+are optional annotations of the types.
+
+\section{Core Syntax}\label{sec:core}
+
+The core syntax (\cref{lst:core-adt}) is an \caps{AST} similar to the raw
+syntax, it is gotten after the variables and types are resolved, so it must be
+well-typed. It is defined at \texttt{Pired.Syntax.Core}.
 
 \begin{listing}
   \begin{minted}{hs}
@@ -63,6 +151,10 @@ data Term
   | Pi Plicity Name Term Term
   | Lam Plicity Name Term
   | App Plicity Term Term
+  | Sigma Name Term Term
+  | Pair Term Term
+  | Proj1 Term
+  | Proj2 Term
   | RowType Term
   | RowLit (MultiMap Label Term)
   | RowExt (MultiMap Label Term) Term
@@ -74,25 +166,777 @@ data Term
   \caption{Core syntax \textls{ADT}}\label{lst:core-adt}
 \end{listing}
 
-\section{Parsing}
+Instead of names, the \mintinline{hs}{Var} constructor here takes a de Bruijn
+level instead (see \cref{ssec:debruijn}), where \mintinline{hs}{Level} is a
+newtype over \mintinline{hs}{Int} defined at \texttt{Pirec.Var.Level}. For
+constructors which bind variables, names are not needed with de Bruijn levels,
+however it is retained in the syntax for prettyprinting purposes.
 
-The Haskell library Megaparsec~\cite{megaparsec} is used to do both lexing and
-parsing at the same time. Megaparsec is a monadic parser combinator
-library~\cite{parsing}.
+The \mintinline{hs}{Meta} constructor represents metavariables, which are
+unsolved types and terms that are assigned to unique variables. The
+\mintinline{hs}{Meta} type is a newtype over \mintinline{hs}{Int} defined at
+\texttt{Pirec.Var.Meta}. The constructor also takes an optional
+\mintinline{hs}{BoundMask}, which is a mask over the environment which selects
+all the bound variables (in contrast to variables defined in let expressions),
+it is defined at \texttt{Pirec.BoundMask}, it is used when inserting
+metavariables, so when it is evaluated, the metavariable is applied to all the
+bound variables in scope~\cite{elabzoo}.
 
-\section{Evaluation}
+\subsection{Multimaps}\label{ssec:multimap}
+
+The rows and records are normalized to multimaps so that they can be compared
+easily without taking order of keys into account. \mintinline{hs}{RowLit} stands
+for a row with some fields, and \mintinline{hs}{RowExt} represents extension of
+some fields. Similarly, \mintinline{hs}{RecordLit} is a record with some fields,
+but \mintinline{hs}{RecordAlter} is an alteration of a record, meaning both the
+extension and the restriction of some fields. \mintinline{hs}{RowExt} and
+\mintinline{hs}{RecordAlter} have the invariant that the multimap cannot be
+empty.
+
+\mintinline{hs}{MultiMap} is a type defined at \texttt{Pirec.Data.MultiMap}, it
+is a newtype over unordered map of ordered sequences. It has the invariant that
+each sequence is non-empty. The keys and values are generic type variables to
+provide type safety for defining general multimap manipulation functions.
+
+Several typeclasses are automatically derived for \mintinline{hs}{MultiMap},
+such as \mintinline{hs}{Eq} and \mintinline{hs}{Traversable}.
+\mintinline{hs}{Semigroup} and \mintinline{hs}{Monoid} instances are defined for
+merging multimaps. An instance for the \mintinline{hs}{Ix} typeclass from Optics
+(see \cref{ssec:optics}) is also defined an affine traversal for indexing
+multimaps with a key and a sequence index.
+
+Operations defined include \mintinline{hs}{match}, which returns a new multimap
+if the two input multimaps have the same keys and the same amount of values at
+each key, the new values are calculated with a given input function.
+
+Another operation is \mintinline{hs}{difference}, which calculates the
+difference of two multimaps. If both multimaps have amount of values at a key,
+then as many are dropped from the first multimap as there are in the second
+multimap.
+
+\subsection{MultiMapAlter}\label{ssec:multimapalter}
+
+Another related type is \mintinline{hs}{MultiMapAlter}, which represents
+alteration to a multimap (insertion and deletion). It is defined at
+\texttt{Pirec.Data.MultiMapAlter}.
+
+It is a newtype over \mintinline{hs}{ElemAlter}, which represent the insertion
+and deletion of at a single key. \mintinline{hs}{ElemAlter} is defined to be the
+product of an integer and a sequence. The integer is the amount to remove at a
+key, and the sequence is the values to insert at a key.
+
+\mintinline{hs}{MultiMapAlter} has the invariant that \mintinline{hs}{ElemAlter}
+cannot be an alteration that does nothing. This is checked with
+\mintinline{hs}{elemIsId}, which checks that the integer is not zero and the
+sequence is not empty. The function \mintinline{hs}{elemDrop} compares an
+integer and the length of a sequence, then subtracts from the integer as much as
+the length of the sequence or drops from the sequence as much as the integer,
+depending on whichever is larger, finally it embeds the result into
+\mintinline{hs}{ElemAlter}.
+
+The \mintinline{hs}{Semigroup} instance of \mintinline{hs}{ElemAlter}
+(\cref{lst:elemalter-semigroup}) is the composition of alterations. Removal from
+the left cancels the insertion from the right alteration, while the others are
+added to the remains.
+
+\mintinline{hs}{MultiMapAlter} also has a \mintinline{hs}{Semigroup} instance
+which is the composition. Each element is composed with
+\mintinline{hs}{ElemAlter}'s \mintinline{hs}{Semigroup} instance, if an
+element's result is the identity alteration, then the key gets removed from the
+\mintinline{hs}{MultiMapAlter}.
+
+\begin{listing}
+  \begin{minted}{hs}
+instance Semigroup (ElemAlter a) where
+  ElemAlter i xs <> ElemAlter j ys = ElemAlter (i' + j) (xs <> ys')
+   where
+    ElemAlter i' ys' = elemDrop i ys
+  \end{minted}
+  \caption{The \mintinline{hs}{Semigroup} instance of \mintinline{hs}{ElemAlter}
+  }\label{lst:elemalter-semigroup}
+\end{listing}
+
+The function \mintinline{hs}{apply} applies \mintinline{hs}{MultiMapAlter} to a
+multimap. It applies elementwise and the key is deleted when the resulting
+sequence at a key is empty. The function \mintinline{hs}{lookup} takes a key and
+an index, then returns the value if it exists at that key and index, otherwise
+it returns another index, but subtracing the length of the sequence and adding
+the number of removals to the original index. This is to ensure that the
+indexing an inner record will correct after the alterations.
+
+The \mintinline{hs}{match} function is similar to the \mintinline{hs}{match}
+function of \mintinline{hs}{MultiMap}, but here the integer also needs to match,
+in addition to the sequence. There is an indexed fold optic, which folds over
+the elements insertion for each key, but gives a \mintinline{hs}{Nothing} for
+each element removal.
+
+\section{Values}\label{sec:value}
+
+Values (\cref{lst:value-adt}) are what terms from core syntax are evaluated to,
+it is defined at \texttt{Pirec.Value}.
+
+\begin{listing}
+  \begin{minted}{hs}
+data Value
+  = Neut Var Spine
+  | Univ
+  | Pi Plicity Name ~Value Closure
+  | Lam Plicity Name Closure
+  | Sigma Name Value Closure
+  | Pair Value ~Value
+  | RowType Value
+  | RowLit (MultiMap Label Value)
+  | RecordType Value
+  | RecordLit (MultiMap Label Value)
+  \end{minted}
+  \caption{Value \caps{ADT}}\label{lst:value-adt}
+\end{listing}
+
+First, there is the \mintinline{hs}{Neut} constructor, which represents neutral
+values (see \cref{fig:neutral}). It takes a variable and a spine. The variable
+is either a rigid debruijn level (\mintinline{hs}{Rigid}), or a flex
+metavariable (\mintinline{hs}{Flex}). The spine is the \caps{AST} of the neutral
+value, where \mintinline{hs}{Nil} is where the variable would go. But instead it
+is an argument of the \mintinline{hs}{Neut} so that one does not have to
+traverse through the spine to check whether the variable is rigid or flex.
+
+\begin{listing}
+  \begin{minted}{hs}
+data Spine
+  = Nil
+  | App Plicity Spine ~Value
+  | Proj1 Spine
+  | Proj2 Spine
+  | RowExt (MultiMap Label Value) Spine
+  | RecordProj Label Int Spine
+  | RecordAlter (MultiMapAlter Label Value) Spine
+  \end{minted}
+  \caption{Spine \caps{ADT}}\label{lst:spine-adt}
+\end{listing}
+
+Let expression is not represented in values, since it is not in normal form. All
+other constructors are similar to the structure of the core syntax, except that
+\mintinline{hs}{Pi}, \mintinline{hs}{Lam}, and \mintinline{hs}{Sigma} have
+closures in their body, they all bind a variable. \mintinline{hs}{Closure} is a
+product of an environment of values (see \cref{ssec:env}) and a term, it
+represents a delayed evaluation of the term where one can insert a value to the
+environment to substitute the bound variable.
+
+The function argument of \mintinline{hs}{App} and the second component of
+\mintinline{hs}{Pair} are lazy to improve performance during unification. The type
+of \mintinline{hs}{Pi} is lazy because it might not be needed to be evaluated when
+typechecking.
+
+Several smart constructors are defined for operators. The functions
+\mintinline{hs}{proj1} and \mintinline{hs}{proj2} take their respective element
+from a pair if the argument is a pair, otherwise the respective constructor is
+added to the spine. The \mintinline{hs}{rowExt} function (\cref{lst:rowext})
+extends a row literal if the argument is such, and it also extends a row
+extension in the spine if the spine does have an outer row extension. The
+\mintinline{hs}{recordProj} function can select the field from a record literal,
+or it could lookup from a record alteration, in this case, it uses
+\mintinline{hs}{MultiMapAlter}'s lookup, and if the element is not found, then
+the new spine has the record projection with the new index. The
+\mintinline{hs}{recordAlter} function can alter a record literal, or it could
+compose with another \mintinline{hs}{RecordAlter} in the spine, but in this
+case, if the composition is the identity, then the \mintinline{hs}{RecordAlter}
+disappears.
+
+\begin{listing}
+  \begin{minted}{hs}
+rowExt :: MultiMap Label Value -> Value -> Value
+rowExt ts = \case
+  Neut x spine -> Neut x case spine of
+    RowExt us spine -> RowExt (ts <> us) spine
+    _ -> RowExt ts spine
+  RowLit us -> RowLit (ts <> us)
+  _ -> error "bug"
+\end{minted}
+\caption{The \mintinline{hs}{rowExt} function}\label{lst:rowext}
+\end{listing}
+
+\subsection{Environment}\label{ssec:env}
+
+The environment to be used with de Bruijn levels should be a type that can be
+extended from the end and indexed with a level. For asymptotic performance, the
+\mintinline{hs}{Env} type defined at \texttt{Pirec.Env} is implemented as a
+random access list based on~\cite{funcdata}.
+
+The random access list is defined as \mintinline{hs}{RList} at
+\texttt{Pirec.Data.RList}. The elements are lazy to support evaluating values
+lazily. Operations such as \mintinline{hs}{cons} and \mintinline{hs}{uncons} are
+defined. Indexing is defined as an instance of the Optics library's
+\mintinline{hs}{Ix} typeclass, it is defined with the van Laarhoven based optics
+encoding~\cite{vanlaarhoven}, so that getting and updating at an index do not
+need to be both defined. \caps{GHC} specialization pragmas are used so that the
+defining that way does not harm performance. A
+\mintinline{hs}{TraversableWithIndex} instance is also defined similary, however
+the \mintinline{hs}{Env} which is a newtype over \mintinline{hs}{RList} must
+reverse it and its indices.
+
+\section{Parsing}\label{sec:parsing}
+
+A monadic parser combinator~\cite{parsing-Hutton} library
+called \emph{Megaparsec}~\cite{megaparsec} is used to do both lexing and parsing
+at the same time.
+
+\emph{Parser combinators} can be implemented as an embedded domain specific
+language in a library. They provides primitive parsers and combinators which can
+be used to combine parsers into more complicated parsers. Ultimately it is a
+top-down recursive descent parser, so it cannot directly parse left recursive
+grammar. Having a monadic interface means that the grammar they can parse is no
+longer restricted to being context-free and it allows the freedom to reformulate
+left recursion into right recursion which gets transformed
+afterwards~\cite{parsing-Hutton, parsing-Swierstra}.
+
+The Megaparsec library was originally forked from \emph{Parsec}~\cite{parsec}.
+It has an interface compatible with \caps{MTL}~\cite{mtl}, built-in error
+reporting and customizable errors, and combinators to work with
+indentation~\cite{megaparsec}.
+
+\subsection{Parser type}\label{ssec:parser-type}
+
+The type definition for the Pirec parser defined at
+\texttt{Pirec.Syntax.Raw.Parse.Type} is show in \cref{lst:parsertype}. Reader
+and state monad tranformer from \caps{MTL}~\cite{mtl} are used for some extra
+parsing context and state, which are records, and their fields have overloaded
+label lenses (see \cref{ssec:optics}) that are automatically generated.
+
+\begin{listing}
+  \begin{minted}{hs}
+type Parser = ReaderT ParseContext (StateT ParseState (Parsec Void Text))
+
+newtype ParseContext = ParseContext
+  { blockIndent :: Int
+  }
+
+data ParseState = ParseState
+  { lexemeEnd :: Int
+  , lineStart :: Bool
+  }
+  \end{minted}
+  \caption{The Pirec parser type definitions}\label{lst:parsertype}
+\end{listing}
+
+The \mintinline{text}{lexemeEnd} field in the state is used to track the offset
+of the end of the last token parsed, so that it can be stored in a source code
+span for error reporting without including the following white space.
+
+The \mintinline{text}{blockIndent} and the \mintinline{text}{lineStart} field
+are both for indentation sensitivity. The \mintinline{text}{blockIndent} field
+is for tracking the indentation of the current block, it is in a reader context
+so that \mintinline{text}{local} can be used to modify it only in an
+environment. The indentation level for \mintinline{text}{blockIndent} at the
+start is 0. The \mintinline{text}{lineStart} field is to signify whether the
+next token is at the start of the line, depending on it, a token's indentation
+level either should be equal to the block's indentation level, or greater than
+it.
+
+\subsection{Parsing tokens}\label{ssec:parsing-tokens}
+
+The parsers for the tokens are at \texttt{Pirec.Syntax.Raw.Parse.Lex}. The
+parser for white space (\mintinline{hs}{space}) uses Megaparsec library's
+utility function, it also parses comments based on user supplied comment
+parsers, all of which are ignored by the parser. The line comment parser uses
+the function supplied by Megaparsec, the block comment parser is defined so that
+closing the comment is optional, and to allows nesting.
+
+For parsing tokens, the \mintinline{hs}{lexeme} function is defined (see
+\cref{lst:lexeme}), every token parser will be wrapped with it. It takes a
+parser as input and returns a new parser that takes indentation into account and
+ignores the white space following the token. First it checks whether the current
+token is at the start of a block's line, if it is, then check if it is at the
+same indentation as the current block, otherwise check if it has greater
+indentation. Afterwards use the given parser then get the position and set
+\mintinline{text}{lineStart} to false and parse the following white space.
+
+\begin{listing}
+  \begin{minted}{hs}
+lexeme :: Parser a -> Parser a
+lexeme p = do
+  lineStart <- use #lineStart
+  _ <- indentGuard (if lineStart then EQ else GT)
+  x <- p
+  assign #lexemeEnd =<< getOffset
+  assign #lineStart False
+  x <$ space
+  \end{minted}
+  \caption{The \mintinline{hs}{lexeme} function}\label{lst:lexeme}
+\end{listing}
+
+The function \mintinline{hs}{indentGuard} wraps Megaparsec's function with the
+same name so that it uses \mintinline{text}{blockIndent} from the reader
+context, which can be 0, not just a positive number.
+
+To parse a token which cannot be an identifier, the parser
+\mintinline{hs}{symbol} should be used, otherwise it is a keyword and the parser
+\mintinline{hs}{keyword} should be used instead. The difference is that
+\mintinline{hs}{keyword} checks that the character following the token is not an
+identifier character. All the special symbols and keywords are defined using
+\mintinline{hs}{symbol} or \mintinline{hs}{keyword}
+
+The function \mintinline{hs}{isIdentChar} is used to check if a character is an
+identifier character (see \cref{sec:lex}), it checks using Unicode categories,
+and it cannot be a special character declared in \mintinline{hs}{specialChars}.
+Identifiers are parsed as a sequence of one or more identifier characters, and
+it is checked that it is not a keyword.
+
+The parser \mintinline{hs}{ident} is for identifier,
+\mintinline{hs}{binderIdent} is for identifiers in binders as it allows
+wildcards. The parser \mintinline{hs}{fieldLabelOrName} parses a field label,
+but besides the label, it also returns a \mintinline{hs}{Name} if it is a valid
+identifier. Since labels can be string literals, it is not a valid identifier in
+that case.
+
+The function \mintinline{text}{indentBlock} (\cref{lst:indentblock}) is for
+parsing blocks, which can be denoted with both braces and indentation (see
+\cref{sec:lex}). It takes a function which takes a line separator and returns a
+parser for parsing the inside of the block. The parser first tries to parse the
+block surrounded by braces, with semicolon as line separator and with an
+optional trailing semicolon. If it fails, the parser checks if the current
+indentation level is greater than the outer block's, then sets the indentation
+level for the current block to the current level in the context of parsing the
+inside of the block, which is parsed by having \mintinline{text}{lineStart} be
+true at the start and for the separator.
+
+\begin{listing}
+  \begin{minted}{hs}
+indentBlock :: (Parser () -> Parser a) -> Parser a
+indentBlock f =
+  choice
+    [ braces $ f (void semicolon) <* optional semicolon
+    , do
+        blockIndent <- indentGuard GT
+        local (#blockIndent .~ unPos blockIndent) $
+          assign #lineStart True *> f (assign #lineStart True)
+    ]
+    <?> "indented block"
+  \end{minted}
+  \caption{The \mintinline{hs}{indentBlock} function}\label{lst:indentblock}
+\end{listing}
+
+\subsection{Parsing syntax}\label{ssec:parsing-syntax}
+
+The function for parsing a whole program is defined at
+\texttt{Pirec.Syntax.Raw.Parse} called \mintinline{hs}{parseRaw}. It first
+parses some leading white space, then parses a let block (see
+\cref{sec:syntax}), and at the end checks if it is at the end of the file.
+
+Expression parsers are written with precedences in mind (see \cref{tab:ops}).
+There is the \mintinline{hs}{Precedence} enumeration defined at
+\texttt{Pirec.Syntax.Precedence}. It is used so that one can add a new
+precedence between existing ones without modifying the parsers of others, as one
+can automatically derive the \mintinline{hs}{Enum} typeclass for Haskell
+enumerations, which contains the \mintinline{hs}{succ} function for getting the
+next element in the enumeration.
+
+The \mintinline{hs}{term} parser parses an expression at the lowest precedence.
+The \mintinline{hs}{termPrec} function takes a precedence and returns a parser
+that parses the constructs at that precedence.
+
+All subexpressions are wrapped with \mintinline{hs}{withSpan}, which is a
+function that takes a term parser and wraps it in the \mintinline{hs}{Span}
+constructor (see \cref{sec:raw}) with the starting offset and the offset in the
+\mintinline{text}{lexemeEnd} field.
+
+Arrows, times signs, and commas are all right associative, so they use the
+\mintinline{hs}{infixRight} function, which takes a precedence and parses a
+right associative operator, with one higher precedence as subexpressions.
+
+Function application and record projection\slash{}restriction are both left
+associative, they use the \mintinline{hs}{suffixes} function, which takes a
+starting parser, and parse suffixes one by one from other parameter. For
+function application, the function arguments can be considered as suffixes which
+can be surrounded by braces if they are implicit. The function application also
+considers \mintinline{pirec.py:PirecLexer -x}{proj1},
+\mintinline{pirec.py:PirecLexer -x}{proj2}, \mintinline{pirec.py:PirecLexer
+  -x}{Row}, and \mintinline{pirec.py:PirecLexer -x}{Rec} applied to arguments as
+functions.
+
+Atoms are at the highest precedence, expressions starting with
+\mintinline{pirec.py:PirecLexer -x}{let}, \mintinline{pirec.py:PirecLexer
+  -x}{∀}, \mintinline{pirec.py:PirecLexer -x}{λ}, \mintinline{pirec.py:PirecLexer
+  -x}{∃}, \mintinline{pirec.py:PirecLexer -x}{#}, or
+\mintinline{pirec.py:PirecLexer -x}{rec} can be considered atomic as the parser
+automatically parses as much as possible (see \cref{sec:syntax}).
+
+Let blocks are parsed using \mintinline{hs}{indentBlock}
+(\cref{lst:parse-letblock}). Inside the block it parses zero or more definitions
+terminated with the separator, at the end it parses an extra term as the return
+value of the let expression. At the start of each definition, the parser first
+tries to parse a binder identifier followed by a colon or an equals sign. It
+needs to be able to backtrack using \mintinline{hs}{try} here, since the
+identifier might be a part of the final term. The optional type could have been
+part of the argument of \mintinline{hs}{try} which would have been simpler, but
+instead that line returns an extra Boolean to denote whether it expects a type,
+this way it would not backtrack after parsing a colon since it cannot be the
+final term anymore.
+
+\begin{listing}
+  \begin{minted}{hs}
+termLetBlock :: Parser R.Term
+termLetBlock = indentBlock \sep -> do
+  fs <- many do
+    (x, hasType) <-
+      try $ (,) <$> binderIdent <*> (True <$ colon <|> False <$ equals)
+    a <- if hasType then Just <$> term <* equals else pure Nothing
+    R.Let x a <$> term <* sep
+  foldr (.) id fs <$> term
+  \end{minted}
+  \caption{The parser for let blocks}\label{lst:parse-letblock}
+\end{listing}
+
+Dependent function types, lambda abstraction, and dependent pair types all have
+similar structure, particularly the binders. The binders of dependent functions
+types and lambda abstraction are parsed with \mintinline{hs}{binderImpl}, it can
+parse bare binder variables, or variables surrounded by parentheses or braces
+with optional type after the variable. Dependent pair types are parsed with a
+different \mintinline{hs}{binder}, which does not allow binders.
+
+Row blocks and record blocks are similarly structured, as both extend the same
+way (see \cref{sec:syntax}), so an extra \mintinline{hs}{rowBlock} function is
+defined. It takes an empty row or record, and a parser to parse each field, then
+returns a parser which parses a block. The inside of the block has the option to
+be empty, or it can be one or more fields separated by the separator. At the
+end, there can be an optional pipe, which a term follows. There can be an extra
+separator before the pipe.
+
+Row literals are parsed straightforwardly using \mintinline{hs}{rowBlock}, where
+each field is followed by a colon and a type. Record literal fields however can
+have optional types besides a term, they can have record modification syntax,
+and they can have a variable by itself which is both a label and a name, so it
+is parsed in a more complicated way (see \cref{lst:parse-recordlit}).
+
+\begin{listing}
+  \begin{minted}{hs}
+termRecordLit :: Parser R.Term
+termRecordLit =
+  recordLit *> rowBlock R.RecordEmpty do
+    (lbl, name) <- fieldLabelOrName
+    let extend a = R.RecordExt lbl a <$ equals <*> term
+        modify a = do
+          t <- coloneq *> term
+          pure $ R.RecordExt lbl a t . R.RecordRestr lbl
+    choice
+      [ extend Nothing <|> modify Nothing
+      , do
+          a <- colon *> term
+          extend (Just a) <|> modify (Just a)
+      , case name of
+          Nothing -> empty
+          Just name -> pure $ R.RecordExt lbl Nothing (R.Var name)
+      ]
+  \end{minted}
+  \caption{The parser for record literals}\label{lst:parse-recordlit}
+\end{listing}
+
+To parse a record field, first, a label is parsed using
+\mintinline{hs}{fieldLabelOrName}, the possibility of being a name will be used
+later. Then it tries to parse record extension or record modification without
+type annotation, so the next token would be an equals sign or colon equals, the
+record modification is directly desugared to record restriction then extension.
+If the token does not match equals sign or colon equals, then it will try
+parsing a colon then a type, then extension or modification with the type given.
+In the end, if all fails, check if the original label is compatible with a
+variable name, if so then desugar this to extending with that variable name.
+
+\section{Metacontext}\label{sec:meta}
+
+The metacontext is a context of metavariables which are can be solved with
+definitions during elaboration. In the project, the library in-other-words is
+used to track metacontext as an effect. The effect definition is shown in
+\cref{lst:metactx}.
+
+\begin{listing}
+  \begin{minted}{hs}
+data MetaLookup :: Effect where
+  MetaLookup :: MetaLookup m (Meta -> Maybe Value)
+
+data MetaState :: Effect where
+  FreshMeta :: MetaState m Meta
+  SolveMeta :: Meta -> Value -> MetaState m ()
+
+type MetaCtx = Bundle [MetaLookup, MetaState]
+  \end{minted}
+  \caption{The definition of metacontext effects}\label{lst:metactx}
+\end{listing}
+
+The command \mintinline{hs}{metaLookup} is used for returning a function that
+looks up a metavariable from the metacontext. It is written like this instead of
+having the command take a metavariable is so that evaluation can remain lazy
+through recursion. This command is separated into its own effect because a lot
+of functions only need read access to the metacontext.
+
+The other two commands that make up the \mintinline{hs}{metaCtx} effect are
+\mintinline{hs}{freshMeta}, which returns a fresh new metavariable, and
+\mintinline{hs}{solveMeta}, which solves a metavariable with a value and stores
+it in the metacontext.
+
+The effect interpreter \mintinline{hs}{runMetaLookup} only interprets
+\mintinline{hs}{MetaLookup}, it takes a pure function, and uses it for the
+command purely.
+
+The interpreter \mintinline{hs}{metaCtxToIO} uses an integer reference and a
+hashtable to implement metacontext, the integer reference refers to the next
+fresh metavariable. For interpreting \mintinline{hs}{metaLookup}, a
+\mintinline{hs}{unsafeDupablePerformIO} is used, so that the lookup is only
+resolved when needed, this way, the lookup is pushed as late as possible, when
+the metavariable might have become solved. The interpreter returns all the
+metavariables with their possibly solved values at the end.
+
+\section{Evaluation}\label{sec:eval}
 
 \emph{Normalization-by-evaluation} (\caps{NBE}) with explicit closures is
-implemented to evaluate lambda terms to normal form.
+implemented to evaluate lambda terms to normal form~\cite{elabzoo, nbe-Abel}.
 
-\section{Unification}
+The \mintinline{hs}{eval} function evaluates a term into a value in an
+environment (see \cref{lst:eval}). It has a recursive inner function which is in
+scope of the metavariabe lookup function. Variables index the environment, let
+expressions extend the environment and recurse on the body, lambda abstractions
+replace the body with a closure, and applications evaluate the function and
+applies it lazily over the evaluated argument. The other constructors are done
+in a straightforward way, with closures, or with the correspoinding smart value
+constructors.
 
-\section{Elaboration}
+\begin{listing}
+  \begin{minted}{hs}
+eval :: Eff MetaLookup m => Env Value -> Term -> m Value
+eval env t = do
+  mlookup <- metaLookup
+  let goEnv !env = go
+       where
+        go = \case
+          Var lx -> env & Env.index lx ?: error "bug"
+          Let _ t u -> goEnv (env & Env.extend (go t)) u
+          Lam pl x t -> V.Lam pl x (V.Closure env t)
+          App pl t u -> appValuePure mlookup pl (go t) (go u)
+          ...
+  pure $ goEnv env t
+  \end{minted}
+  \caption{A fragment of the \mintinline{hs}{eval} function}\label{lst:eval}
+\end{listing}
 
-Bidirectional type-checking algorithm is used~\cite{deptypecheck, lambdapi}.
+There are many utility functions defined together, such as the smart constructor
+for applying a value. It must use metavariable lookup, since the function might
+be a lambda abstraction, then the body must be substituted using
+\mintinline{hs}{eval}. Applying closures and applying spines are also defined.
 
-\section{Main}
+The \mintinline{hs}{forceValue} function (\cref{lst:forcevalue}) takes a value
+and if it is a spine, it tries to solve using the newest metavariable, until it
+cannot be solved. This function should be used before pattern matching on a
+value.
 
-~\cite{optparse}
+\begin{listing}
+  \begin{minted}{hs}
+forceValue :: Eff MetaLookup m => Value -> m Value
+forceValue t = case t of
+  V.Neut (V.Flex mx) spine ->
+    metaLookup ?? mx >>= \case
+      Just t -> appSpine t spine >>= forceValue
+      Nothing -> pure t
+  _ -> pure t
+  \end{minted}
+  \caption{The \mintinline{hs}{forceValue} function}\label{lst:forcevalue}
+\end{listing}
 
-\section{Testing}
+The \mintinline{hs}{quote} function turns a value back into a term. It is
+defined with the \mintinline{hs}{quoteWith} function to generalize over the
+variable handling and the accumulator because the \mintinline{hs}{rename}
+function in unification has the same structure.
+
+The \mintinline{hs}{openClosure} and \mintinline{hs}{closeValue} functions
+convert closures and values to each other. The function \mintinline{hs}{normal}
+computes the normal form of a term by first evaluating it to a value, then
+quoting it back.
+
+\section{Unification}\label{sec:unify}
+
+Untyped pattern unification is implemented similarly as in~\cite{elabzoo} at
+\texttt{Pirec.Unify}.
+
+First, a \mintinline{hs}{Renaming} type is defined at
+\texttt{Pirec.Unify.Renaming}, which contains a level and the renaming of each
+level below that level as a map. An \mintinline{hs}{invert} functions is defined
+(see \cref{lst:invert}), which inverts a spine to a renaming. The inversion only
+works with a metavariable applied to unique rigid variables, otherwise error is
+thrown.
+
+\begin{listing}
+  \begin{minted}{hs}
+invert :: Effs [MetaLookup, Throw UnifyError] m => Spine -> m Renaming
+invert = go
+ where
+  go = \case
+    V.Nil -> pure $ Renaming 0 mempty
+    V.App _ spine t -> do
+      Renaming lvl m <- go spine
+      forceValue t >>= \case
+        V.Neut (V.Rigid lx@(Level n)) V.Nil
+          | Just _ <- m ^. at n -> throw $ Nonlinear lx
+          | otherwise -> pure $ Renaming (lvl + 1) (m & at n ?~ lvl)
+        t -> throw $ Nonvariable t
+    _ -> throw NonInvertable
+  \end{minted}
+  \caption{The \mintinline{hs}{invert} function}\label{lst:invert}
+\end{listing}
+
+The \mintinline{hs}{rename} function renames value according to a renaming, and
+quotes it at the same time, so it uses \mintinline{hs}{quoteWith}. It checks if
+the variable is in scope for the renaming and checks whether the to be solved
+metavariable does not appear in the value, otherwise it throws errors.
+
+The \mintinline{hs}{solve} function (\cref{lst:solve}) tries to solve a
+metavariable given its spine and the value to match. It first inverts the spine
+to a renaming, then uses it to rename the value, then lambda abstractions are
+added based on implicitness of the spine with a recursive
+\mintinline{hs}{abstract} function, and in the end the solution is set in the
+metacontext.
+
+\begin{listing}
+  \begin{minted}{hs}
+solve ::
+  Effs [MetaCtx, Throw UnifyError] m =>
+  Level -> Meta -> Spine -> Value -> m ()
+solve lvl meta spine t = do
+  renaming <- Renaming.invert spine
+  t <- rename meta renaming lvl t
+  solution <- eval Env.empty $ abstract spine t
+  solveMeta meta solution
+  \end{minted}
+  \caption{The \mintinline{hs}{solve} function}\label{lst:solve}
+\end{listing}
+
+The \mintinline{hs}{unify} function matches the inferred and the expected type.
+It recurses both types, and matches both to check that they have the same
+structure. Exceptions are the η-rules of functions, pairs, and records, row
+extensions and record alterations also needed to have some complex combination
+of patterns to unify as desired.
+
+The error type of unification is defined at \texttt{Pirec.Unify.Error},
+containing six of the errors in \cref{sec:errors}. Prettyprinting is also
+defined there.
+
+\section{Elaboration}\label{sec:elab}
+
+Bidirectional type-checking algorithm~\cite{deptypecheck, lambdapi} is used for
+type checking and elaboration. It is defined at \texttt{Pirec.Elab}
+
+The elaboration is computed in a context which is defined at
+\texttt{Pirec.Elab.Context}. It contains the span of the term to be elaborated,
+the environment for evaluation, a map from names to levels and values, a context
+for prettyprinting, and a \mintinline{hs}{boundMask}.
+
+A reader effect containing the elaboration context is used for convenience and
+readability, several common operations are redefined to use the reader effect.
+Two major functions are defined, \mintinline{hs}{check} and
+\mintinline{hs}{infer}. They are defined together in a tuple with mutually
+recursive local functions for convenience.
+
+The error type of elaboration is defined at \texttt{Pirec.Elab.Error}, it
+subsumes the unification errors and contains an additional two errors.
+Prettyprinting is defined through the interface given by Megaparsec, as it shows
+error position the source code visually.
+
+\section{Prettyprinting}
+
+Prettyprinting is defined at \texttt{Pirec.Pretty} with the help of the
+Prettyprinter~\cite{prettyprinter} library with line breaking based on line length and text alignment, it is based on the work of~\cite{prettier}.
+
+Prettyprinting takes a context defined at \texttt{Pirec.Pretty.Context}, it
+contains an environment of names, and a set of names in use. The
+\mintinline{hs}{prettyTermWith} takes the context, a precedence (see
+\cref{ssec:parsing-syntax}), and a term. The term is recursively turned into a
+pretty document. For some special constructors, extra function is written to
+group the same constructors together, so that they can align.
+
+\section{Main}\label{sec:main}
+
+The rough process of executing the main program is show in \cref{fig:main}.
+
+\begin{figure}
+  \resizebox{\textwidth}{!}{\input{graphs/main.tex}}
+  \caption{The steps of the main program}\label{fig:main}
+\end{figure}
+
+For parsing command line arguments, the library
+\emph{optparse-applicative}~\cite{optparse} is used, it is based on the free
+applicative function to be able to introspect and automatically generate a
+suitable help text~\cite{freeapp}.
+
+A type is defined for the command line options at \texttt{Pirec.Options} (see
+\cref{lst:opts}). The function \mintinline{hs}{getOpts} parses a command line
+argument which is the file path, or it could parse \mintinline{text}{--stdin}
+which means that the input will come from the standard input. There are flags to
+control what to show, and whether to evaluate the term.
+
+\begin{listing}
+  \begin{minted}{hs}
+data Options = Options
+  { input :: Input
+  , eval :: Bool
+  , showTerm :: Bool
+  , showType :: Bool
+  , showMetas :: Bool
+  }
+
+data Input
+  = File FilePath
+  | Stdin
+  deriving stock (Show)
+  \end{minted}
+  \caption{The type for the command line options}\label{lst:opts}
+\end{listing}
+
+the \mintinline{hs}{main} function is wrapped with \mintinline{hs}{withUtf8}
+from the library \emph{with-utf8}~\cite{with-utf8} to make \texttt{stdin},
+\texttt{stdout}, and \texttt{stderr} work with \caps{UTF}-8 regardless of system
+and locale. Then it parses the command line options and reads the input file. It
+parses and elaborates the input, then returns the elaborated term and its type,
+the metavariables, and the metavariable lookup function. In the end, depending
+on whether evaluation options is set to true, it normalizes the term, and
+prettyprints the things based on the options.
+
+\section{Testing}\label{sec:test}
+
+The \emph{Hspec} testing framework is used for testing~\cite{hspec}, the package
+\emph{Hspec-discover} is used for automatic test discovery in the \texttt{test}
+folder.
+
+Data types and their operations defined in the project have property based
+random tests~\cite{quickcheck, quickcheck-2} using Hedgehog~\cite{hedgehog},
+where each test case is checked many times with random input. The random data
+generators of Hedgehog have integrated shrinking over the applicative functor
+operations (shrinking is the process of searching for simpler
+counterexamples)~\cite{shrinking}.
+
+Every operation of the \mintinline{hs}{RList} type has property based test case
+to check that the type invariant is maintained and comparing its behavior with
+Haskell list's. As an example, the definition of the test for
+\mintinline{hs}{cons} is shown in \cref{lst:rlist-cons}. It takes a random
+integer and a random list with length of maximum 1000, then converts the list to
+an \mintinline{hs}{RList} and uses \mintinline{hs}{cons} on it. The
+\mintinline{hs}{validToList} function checks if the \mintinline{hs}{RList} is
+valid, if so, it is converted to a normal list. In the end, it is compared to
+the consing of Haskell list.
+
+\begin{listing}
+  \begin{minted}{hs}
+  specify "cons" $ hedgehog do
+    x <- forAll int
+    xs <- forAll $ list 1000 int
+    validToList (RList.cons x (fromList xs)) === Just (x : xs)
+  \end{minted}
+  \caption{Testing \mintinline{hs}{RList}'s \mintinline{hs}{cons} function
+  }\label{lst:rlist-cons}
+\end{listing}
+
+Both \mintinline{hs}{MultiMap} and \mintinline{hs}{MultiMapAlter} also have
+property based test cases for every non-autmatically derived operation. The test
+cases check the invariants and properties such as the associativity of the
+semigroup operation.
+
+The program is tested on a lot of examples in the \texttt{examples} folder, each
+one is typechecked and evaluated without error. There is an extra program at
+\texttt{examples/loop/hurkens.agda} translated from~\cite{hurkens-Agda} based
+on~\cite{hurkens}, which shows that the typing is unsound since it has type in
+type. It is tested that it typechecks, and it does not terminate.

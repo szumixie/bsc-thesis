@@ -22,7 +22,10 @@
 \usepackage{fontspec}
 \setmainfont{Libertinus Serif}
 \setsansfont{Libertinus Sans}
-\setmonofont[Scale = MatchLowercase]{Source Code Pro}
+\setmonofont[
+  Scale = MatchLowercase,
+  Contextuals = AlternateOff,
+]{JetBrains Mono}
 
 \usepackage{mathtools}
 \usepackage[
@@ -38,7 +41,7 @@
 \usepackage{csquotes}
 \setdefaultlanguage[variant = canadian]{english}
 
-\usepackage[sortcites]{biblatex}
+\usepackage[sortcites, alldates = iso, seconds]{biblatex}
 \AtEveryBibitem{\iffieldundef{doi}{}{\clearfield{url}}}
 \setcounter{biburlnumpenalty}{9000}
 \setcounter{biburllcpenalty}{9000}
@@ -73,15 +76,22 @@
         Numbers = {Proportional, Lowercase},
       }#1}}
 
-\newcommand\bibparens[1]{\textup(#1\textup)}
-\newcommand\bibbrackets[1]{\textup[#1\textup]}
+\newcommand\upparens[1]{\textup(#1\textup)}
+\newcommand\upbrackets[1]{\textup[#1\textup]}
 
 \newcommand\coleqq{\coloneqq}
 \newcommand\Coleqq{\mathrel{\Colon=}}
 
+\newcommand\controlchar[1]{\texttt{\backslash{}#1}}
+
+\newcommand\term[1]{\texttt{#1}}
+\newcommand\nonterm[1]{\mathit{#1}}
+
 \newcommand\langkeyword[1]{\operatorname{\mathsf{#1}}}
 \newcommand\Let{\langkeyword{let}}
 \newcommand\Univ{\langkeyword{U}}
+\newcommand\ProjOne{\langkeyword{proj1}}
+\newcommand\ProjTwo{\langkeyword{proj2}}
 \newcommand\RowType{\langkeyword{Row}}
 \newcommand\RecordType{\langkeyword{Rec}}
 \newcommand\RecordLit{\langkeyword{rec}}

@@ -1,0 +1,9 @@
+digraph {
+  graph [ rankdir = LR, ranksep = 0.2 ];
+  node [ shape = none, style = filled, fillcolor = "#cceeff" ];
+  {
+    node [ style = none ];
+    Input Output;
+  };
+  Input -> Parsing -> Elaboration -> Evaluation -> Prettyprinting -> Output;
+}

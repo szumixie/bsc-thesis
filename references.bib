@@ -1,3 +1,5 @@
+@string{today = {2021-05-29}}
+
 @article{functional-Hudak,
   author    = {Paul Hudak},
   title     = {Conception, Evolution, and Application of Functional Programming Languages},
@@ -135,7 +137,7 @@
                Ivan Hal Sudborough},
   title     = {Demonstrating Lambda Calculus Reduction},
   booktitle = {The Essence of Computation, Complexity, Analysis, Transformation.
-               Essays Dedicated to Neil D. Jones \bibbrackets{on occasion of his 60th birthday}},
+               Essays Dedicated to Neil D. Jones \upbrackets{on occasion of his 60th birthday}},
   series    = {Lecture Notes in Computer Science},
   volume    = {2566},
   pages     = {420--435},
@@ -149,7 +151,7 @@
 }
 
 @book{lambda-Church,
-  title     = {The Calculi of Lambda Conversion \bibparens{\caps{AM}-6}},
+  title     = {The Calculi of Lambda Conversion \upparens{\caps{AM}-6}},
   isbn      = {9781400881932},
   url       = {https://www.degruyter.com/document/doi/10.1515/9781400881932/html},
   publisher = {Princeton University Press},
@@ -177,7 +179,7 @@
   doi       = {10.1090/s0002-9947-1936-1501858-0},
   url       = {https://doi.org/10.1090/s0002-9947-1936-1501858-0},
   year      = 1936,
-  publisher = {American Mathematical Society \bibparens{\caps{AMS}}},
+  publisher = {American Mathematical Society \upparens{\caps{AMS}}},
   volume    = {39},
   number    = {3},
   pages     = {472--472},
@@ -233,7 +235,7 @@
   pages     = {381--392},
   author    = {de Bruijn, N. G.},
   title     = {Lambda Calculus Notation with Nameless Dummies, a Tool for Automatic Formula Manipulation, with Application to the {Church--Rosser} Theorem},
-  journal   = {Indagationes Mathematicae \bibparens{Proceedings}}
+  journal   = {Indagationes Mathematicae \upparens{Proceedings}}
 }
 
 @book{combinator-Curry,
@@ -328,6 +330,48 @@
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
+@book{type-Girard,
+  series    = {Cambridge Tracts in Theoretical Computer Science},
+  title     = {Proofs and Types},
+  isbn      = {9780521371810},
+  number    = {7},
+  publisher = {Cambridge University Press},
+  author    = {Girard, Jean-Yves},
+  year      = {1989},
+  keywords  = {Lambda calculus}
+}
+
+@article{milner,
+  author    = {Robin Milner},
+  title     = {A Theory of Type Polymorphism in Programming},
+  journal   = {J. Comput. Syst. Sci.},
+  volume    = {17},
+  number    = {3},
+  pages     = {348--375},
+  year      = {1978},
+  url       = {https://doi.org/10.1016/0022-0000(78)90014-4},
+  doi       = {10.1016/0022-0000(78)90014-4},
+  timestamp = {Tue, 16 Feb 2021 14:04:22 +0100},
+  biburl    = {https://dblp.org/rec/journals/jcss/Milner78.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{coc,
+  author    = {Thierry Coquand and
+               Gérard P. Huet},
+  title     = {The Calculus of Constructions},
+  journal   = {Inf. Comput.},
+  volume    = {76},
+  number    = {2/3},
+  pages     = {95--120},
+  year      = {1988},
+  url       = {https://doi.org/10.1016/0890-5401(88)90005-3},
+  doi       = {10.1016/0890-5401(88)90005-3},
+  timestamp = {Fri, 12 Feb 2021 22:15:30 +0100},
+  biburl    = {https://dblp.org/rec/journals/iandc/CoquandH88.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
 @book{martinloef,
   author    = {Per Martin{-}Löf},
   title     = {Intuitionistic Type Theory},
@@ -341,35 +385,166 @@
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
+@book{tt-Nederpelt,
+  title      = {Type Theory and Formal Proof: An Introduction},
+  isbn       = {9781107036505},
+  shorttitle = {Type Theory and Formal Proof},
+  publisher  = {Cambridge University Press},
+  author     = {Rob Nederpelt and Geuvers, Herman},
+  year       = {2014},
+  keywords   = {Type theory, COMPUTERS / Programming Languages / General}
+}
+
+@article{lambdacube,
+  author    = {Henk Barendregt},
+  title     = {Introduction to Generalized Type Systems},
+  journal   = {J. Funct. Program.},
+  volume    = {1},
+  number    = {2},
+  pages     = {125--154},
+  year      = {1991},
+  timestamp = {Fri, 19 Mar 2004 13:37:10 +0100},
+  biburl    = {https://dblp.org/rec/journals/jfp/Barendregt91.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{boehmberarducci,
+  author    = {Corrado Böhm and
+               Alessandro Berarducci},
+  title     = {Automatic Synthesis of Typed Lambda-Programs on Term Algebras},
+  journal   = {Theor. Comput. Sci.},
+  volume    = {39},
+  pages     = {135--154},
+  year      = {1985},
+  url       = {https://doi.org/10.1016/0304-3975(85)90135-5},
+  doi       = {10.1016/0304-3975(85)90135-5},
+  timestamp = {Wed, 17 Feb 2021 21:57:18 +0100},
+  biburl    = {https://dblp.org/rec/journals/tcs/BohmB85.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{prop-Wadler,
+  author    = {Philip Wadler},
+  title     = {Propositions as Types},
+  journal   = {Commun. \caps{ACM}},
+  volume    = {58},
+  number    = {12},
+  pages     = {75--84},
+  year      = {2015},
+  url       = {https://doi.org/10.1145/2699407},
+  doi       = {10.1145/2699407},
+  timestamp = {Wed, 14 Nov 2018 10:22:36 +0100},
+  biburl    = {https://dblp.org/rec/journals/cacm/Wadler15.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@book{curryhoward,
+  author    = {Morten Heine Sørensen and Pawel Urzyczyin},
+  series    = {Studies in Logic and the Foundations of Mathematics},
+  title     = {Lectures on the {Curry--Howard} Isomorphism},
+  volume    = {149},
+  isbn      = {9780444520777},
+  url       = {https://linkinghub.elsevier.com/retrieve/pii/S0049237X06X80011},
+  publisher = {Elsevier},
+  year      = {2006},
+  doi       = {10.1016/S0049-237X(06)X8001-1}
+}
+
+@online{hurkens-Agda,
+  author  = {Ulf Norell},
+  title   = {\upbrackets{Agda} A Plea For Set:Set},
+  url     = {https://lists.chalmers.se/pipermail/agda/2008/000316.html},
+  urldate = today
+}
+
+@inproceedings{hurkens,
+  author    = {Antonius J. C. Hurkens},
+  editor    = {Mariangiola Dezani{-}Ciancaglini and
+               Gordon D. Plotkin},
+  title     = {A Simplification of Girard's Paradox},
+  booktitle = {Typed Lambda Calculi and Applications, Second International Conference
+               on Typed Lambda Calculi and Applications, \caps{TLCA} '95, Edinburgh, \caps{UK},
+               April 10--12, 1995, Proceedings},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {902},
+  pages     = {266--278},
+  publisher = {Springer},
+  year      = {1995},
+  url       = {https://doi.org/10.1007/BFb0014058},
+  doi       = {10.1007/BFb0014058},
+  timestamp = {Tue, 14 May 2019 10:00:41 +0200},
+  biburl    = {https://dblp.org/rec/conf/tlca/Hurkens95.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
 @manual{haskell2010,
-  editor = {Simon Marlow},
-  title  = {{Haskell} 2010 Language Report},
-  year   = {2010},
-  url    = {https://www.haskell.org/onlinereport/haskell2010/}
+  editor  = {Simon Marlow},
+  title   = {{Haskell} 2010 Language Report},
+  year    = {2010},
+  url     = {https://www.haskell.org/onlinereport/haskell2010/},
+  urldate = today
 }
 
-@manual{ghc,
-  author  = {{\caps{GHC} Team}},
-  title   = {\caps{GHC} User's Guide},
-  version = {8.10.4},
+@book{agda,
+  series    = {Doktorsavhandlingar vid {Chalmers Tekniska Högskola}},
+  title     = {Towards a Practical Programming Language Based on Dependent Type Theory},
+  isbn      = {9789172919969},
+  number    = {N. S., 2677},
+  publisher = {Chalmers Univ. of Technology},
+  author    = {Norell, Ulf},
+  year      = {2007}
+}
+
+@book{ml,
+  author    = {Robin Milner and
+               Mads Tofte and
+               Robert Harper},
+  title     = {Definition of Standard \caps{ML}},
+  publisher = {\caps{MIT} Press},
+  year      = {1990},
+  isbn      = {978-0-262-63132-7},
+  timestamp = {Tue, 14 Mar 2017 11:56:49 +0100},
+  biburl    = {https://dblp.org/rec/books/daglib/0069232.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@manual{python,
+  author  = {{Python Software Foundation}},
+  title   = {The {Python} Language Reference},
+  version = {3.8.10},
   year    = {2021},
-  url     = {https://downloads.haskell.org/ghc/8.10.4/docs/html/users_guide/index.html}
-}
-
-@manual{stack,
-  author       = {{Stack contributors}},
-  title        = {The {Haskell} Tool {Stack}},
-  version      = {2.7.1},
-  organization = {Commercial Haskell \caps{SIG}},
-  year         = {2021},
-  url          = {https://docs.haskellstack.org/en/v2.7.1/}
+  url     = {https://docs.python.org/3.8/reference/index.html},
+  urldate = today
 }
 
 @online{elabzoo,
-  author = {András Kovács},
-  title  = {Elaboration-zoo},
-  year   = {2021},
-  url    = {https://github.com/AndrasKovacs/elaboration-zoo/tree/dc5904b092657267ef9eda22c56c8d907ff811db}
+  author  = {András Kovács},
+  title   = {Elaboration-zoo},
+  year    = {2021},
+  url     = {https://github.com/AndrasKovacs/elaboration-zoo/tree/dc5904b092657267ef9eda22c56c8d907ff811db},
+  urldate = today
+}
+
+@inproceedings{nbe-Abel,
+  author    = {Andreas Abel and
+               Klaus Aehlig and
+               Peter Dybjer},
+  editor    = {Marcelo Fiore},
+  title     = {Normalization by Evaluation for Martin-Löf Type Theory
+               with One Universe},
+  booktitle = {Proceedings of the 23rd Conference on the Mathematical Foundations
+               of Programming Semantics, \caps{MFPS} 2007, New Orleans,
+               \caps{LA}, \caps{USA}, April 11-14, 2007},
+  series    = {Electronic Notes in Theoretical Computer Science},
+  volume    = {173},
+  pages     = {17--39},
+  publisher = {Elsevier},
+  year      = {2007},
+  url       = {https://doi.org/10.1016/j.entcs.2007.02.025},
+  doi       = {10.1016/j.entcs.2007.02.025},
+  timestamp = {Mon, 08 Feb 2021 13:26:18 +0100},
+  biburl    = {https://dblp.org/rec/journals/entcs/AbelAD07.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
 @article{deptypecheck,
@@ -431,49 +606,356 @@
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
+@manual{isoebnf,
+  author  = {{International Organization for Standardization}},
+  title   = {\caps{ISO/IEC} 14977:1996 -- Information technology -- Syntactic
+metalanguage -- Extended \caps{BNF}},
+  year    = {1996},
+  url     = {https://www.iso.org/standard/26153.html},
+  urldate = today
+}
+
+@manual{ghc,
+  author  = {{\caps{GHC} Team}},
+  title   = {{Glasgow Haskell Compiler} 8.10.4 User's Guide},
+  version = {8.10.4},
+  year    = {2021},
+  url     = {https://downloads.haskell.org/ghc/8.10.4/docs/html/users_guide/index.html},
+  urldate = today
+}
+
+@manual{blockargs,
+  author  = {Takano Akio},
+  title   = {{BlockArguments} Extension},
+  year    = {2017},
+  url     = {https://github.com/ghc-proposals/ghc-proposals/blob/master/proposals/0090-block-arguments.rst},
+  urldate = today
+}
+
+@manual{stack,
+  author       = {{Stack contributors}},
+  title        = {The {Haskell} Tool {Stack}},
+  version      = {2.7.1},
+  organization = {Commercial Haskell \caps{SIG}},
+  year         = {2021},
+  url          = {https://docs.haskellstack.org/en/v2.7.1/},
+  urldate      = today
+}
+
+@manual{cabal,
+  author  = {{Cabal Team}},
+  title   = {{Cabal} 3.4.0.0 User's Guide},
+  version = {3.4},
+  url     = {https://cabal.readthedocs.io/en/3.4/},
+  urldate = today
+}
+
+@online{cabal-prepos,
+  author  = {Matthew Bauer and others},
+  title   = {Set -Wno-prepositive-qualified-module in Paths\_*.hs},
+  url     = {https://github.com/haskell/cabal/pull/7352},
+  urldate = today
+}
+
+@online{hpack,
+  author  = {Simon Hengel},
+  title   = {Hpack: A Modern Format for {Haskell} Packages},
+  version = {0.34.3},
+  year    = {2020},
+  url     = {https://github.com/sol/hpack/tree/0.34.3},
+  urldate = today
+}
+
+@manual{hlint,
+  author  = {Neil Mitchell},
+  title   = {{HLint}: Source Code Suggestions},
+  version = {3.2.7},
+  year    = {2021},
+  url     = {https://hackage.haskell.org/package/hlint-3.2.7},
+  urldate = today
+}
+
+@manual{actions,
+  author  = {{GitHub, Inc.}},
+  title   = {{GitHub Actions} Documentation},
+  year    = {2021},
+  url     = {https://docs.github.com/en/actions},
+  urldate = today
+}
+
+@online{actions-Haskell,
+  author  = {{GitHub, Inc.} and others},
+  title   = {{Haskell} {Github Actions}},
+  version = {1},
+  year    = {2020},
+  url     = {https://github.com/haskell/actions/tree/v1},
+  urldate = today
+}
+
+@manual{fourmolu,
+  author  = {Matt Parsons and others},
+  title   = {{Fourmolu}: A Formatter for {Haskell} Source Code},
+  version = {0.3.0.0},
+  year    = {2021},
+  url     = {http://hackage.haskell.org/package/fourmolu-0.3.0.0},
+  urldate = today
+}
+
 @manual{relude,
-  author       = {Dmitrii Kovanikov and Veronika Romashkina and Stephen Diehl and Serokell},
-  title        = {Relude},
+  author       = {Dmitrii Kovanikov and Veronika Romashkina and Stephen Diehl and {Serokell}},
+  title        = {Relude: Safe, Performant, User-Friendly and Lightweight {Haskell Standard Library}},
   version      = {1.0.0.1},
   organization = {Kowainik},
   year         = {2021},
-  url          = {http://hackage.haskell.org/package/relude-1.0.0.1}
+  url          = {http://hackage.haskell.org/package/relude-1.0.0.1},
+  urldate      = today
 }
 
 @manual{optics,
   author       = {Adam Gundry and Andres Löh and Andrzej Rybczak and Oleg Grenrus},
-  title        = {Optics},
+  title        = {Optics: Optics as an Abstract Interface},
   version      = {0.4},
   organization = {Well-Typed \caps{LLP}},
   year         = {2021},
-  url          = {http://hackage.haskell.org/package/optics-0.4}
+  url          = {http://hackage.haskell.org/package/optics-0.4},
+  urldate      = today
+}
+
+@article{viewupdate,
+  author    = {J. Nathan Foster and
+               Michael B. Greenwald and
+               Jonathan T. Moore and
+               Benjamin C. Pierce and
+               Alan Schmitt},
+  title     = {Combinators for Bidirectional Tree Transformations: A Linguistic
+               Approach to the View-Update Problem},
+  journal   = {\caps{ACM} Trans. Program. Lang. Syst.},
+  volume    = {29},
+  number    = {3},
+  pages     = {17},
+  year      = {2007},
+  url       = {https://doi.org/10.1145/1232420.1232424},
+  doi       = {10.1145/1232420.1232424},
+  timestamp = {Tue, 06 Nov 2018 12:51:29 +0100},
+  biburl    = {https://dblp.org/rec/journals/toplas/FosterGMPS07.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{vanlaarhoven,
+  author  = {van Laarhoven, Twan},
+  title   = {\caps{CPS} Based Functional References},
+  year    = {2009},
+  url     = {https://www.twanvl.nl/blog/haskell/cps-functional-references},
+  urldate = today
+}
+
+@manual{lens,
+  author  = {Edward Kmett},
+  title   = {{Lens}: Lenses, Folds, and Traversals},
+  version = {5.0.1},
+  year    = {2021},
+  url     = {http://hackage.haskell.org/package/lens-5.0.1},
+  urldate = today
+}
+
+@article{profunctor,
+  author    = {Matthew Pickering and
+               Jeremy Gibbons and
+               Nicolas Wu},
+  title     = {Profunctor Optics: Modular Data Accessors},
+  journal   = {Art Sci. Eng. Program.},
+  volume    = {1},
+  number    = {2},
+  pages     = {7},
+  year      = {2017},
+  url       = {https://doi.org/10.22152/programming-journal.org/2017/1/7},
+  doi       = {10.22152/programming-journal.org/2017/1/7},
+  timestamp = {Fri, 09 Apr 2021 18:29:41 +0200},
+  biburl    = {https://dblp.org/rec/journals/programming/PickeringGW17.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
 @manual{inotherwords,
   author  = {Love Waern},
-  title   = {In-other-words},
+  title   = {In-other-words: A Higher-Order Effect System Where the Sky's the Limit},
   version = {0.2.0.0},
   year    = {2021},
-  url     = {http://hackage.haskell.org/package/in-other-words-0.2.0.0}
+  url     = {http://hackage.haskell.org/package/in-other-words-0.2.0.0},
+  urldate = today
+}
+
+@inproceedings{transformers,
+  author    = {Sheng Liang and
+               Paul Hudak and
+               Mark P. Jones},
+  editor    = {Ron K. Cytron and
+               Peter Lee},
+  title     = {Monad Transformers and Modular Interpreters},
+  booktitle = {Conference Record of POPL'95: 22nd \caps{ACM SIGPLAN-SIGACT} Symposium
+               on Principles of Programming Languages, San Francisco, California,
+               \caps{USA}, January 23--25, 1995},
+  pages     = {333--343},
+  publisher = {\caps{ACM} Press},
+  year      = {1995},
+  url       = {https://doi.org/10.1145/199448.199528},
+  doi       = {10.1145/199448.199528},
+  timestamp = {Tue, 06 Nov 2018 11:07:43 +0100},
+  biburl    = {https://dblp.org/rec/conf/popl/LiangHJ95.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@manual{mtl,
+  author  = {Andy Gill and others},
+  title   = {\caps{MTL}: Monad Classes, Using Functional Dependencies},
+  version = {2.2.2},
+  year    = {2018},
+  url     = {http://hackage.haskell.org/package/mtl-2.2.2},
+  urldate = today
+}
+
+@inproceedings{extensible,
+  author    = {Oleg Kiselyov and
+               Amr Sabry and
+               Cameron Swords},
+  editor    = {Chung{-}chieh Shan},
+  title     = {Extensible Effects: An Alternative to Monad Transformers},
+  booktitle = {Proceedings of the 2013 \caps{ACM SIGPLAN} Symposium on Haskell, Boston,
+               \caps{MA}, \caps{USA}, September 23--24, 2013},
+  pages     = {59--70},
+  publisher = {\caps{ACM}},
+  year      = {2013},
+  url       = {https://doi.org/10.1145/2503778.2503791},
+  doi       = {10.1145/2503778.2503791},
+  timestamp = {Sat, 05 Sep 2020 18:03:54 +0200},
+  biburl    = {https://dblp.org/rec/conf/haskell/KiselyovSS13.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{effect,
+  author    = {Ismael Figueroa and
+               Nicolas Tabareau and
+               Éric Tanter},
+  title     = {Effect Capabilities for {Haskell}: Taming Effect Interference in Monadic
+               Programming},
+  journal   = {Sci. Comput. Program.},
+  volume    = {119},
+  pages     = {3--30},
+  year      = {2016},
+  url       = {https://doi.org/10.1016/j.scico.2015.11.010},
+  doi       = {10.1016/j.scico.2015.11.010},
+  timestamp = {Wed, 17 Feb 2021 21:56:24 +0100},
+  biburl    = {https://dblp.org/rec/journals/scp/FigueroaTT16.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@manual{freersimple,
+  author  = {Allele Dev and {Ixcom Core Team} and Alexis King and others},
+  title   = {Freer-simple: Implementation of a Friendly Effect System for {Haskell}},
+  version = {1.2.1.1},
+  year    = {2021},
+  url     = {http://hackage.haskell.org/package/freer-simple-1.2.1.1},
+  urldate = today
+}
+
+@inproceedings{effectscope,
+  author    = {Nicolas Wu and
+               Tom Schrijvers and
+               Ralf Hinze},
+  editor    = {Wouter Swierstra},
+  title     = {Effect handlers in scope},
+  booktitle = {Proceedings of the 2014 \caps{ACM SIGPLAN} symposium on Haskell, Gothenburg,
+               Sweden, September 4--5, 2014},
+  pages     = {1--12},
+  publisher = {\caps{ACM}},
+  year      = {2014},
+  url       = {https://doi.org/10.1145/2633357.2633358},
+  doi       = {10.1145/2633357.2633358},
+  timestamp = {Sat, 19 Oct 2019 20:24:41 +0200},
+  biburl    = {https://dblp.org/rec/conf/haskell/WuSH14.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@manual{fusedeffects,
+  author  = {Nicolas Wu and Tom Schrijvers and Rob Rix and Patrick Thomson},
+  title   = {Fused-effects: A Fast, Flexible, Fused Effect System},
+  year    = {2021},
+  version = {1.1.1.1},
+  url     = {http://hackage.haskell.org/package/fused-effects-1.1.1.1},
+  urldate = today
+}
+
+@manual{polysemy,
+  author  = {Sandy Maguire},
+  title   = {Polysemy: Higher-Order, Low-Boilerplate Free Monads},
+  version = {1.5},
+  year    = {2021},
+  url     = {http://hackage.haskell.org/package/polysemy-1.5.0.0},
+  urldate = today
+}
+
+@online{polysemy-nondet,
+  author  = {Love Waern},
+  title   = {Choice of Functorial State for runNonDet},
+  year    = {2019},
+  url     = {https://github.com/polysemy-research/polysemy/issues/246},
+  urldate = today
+}
+
+@online{eff,
+  author       = {Alexis King and others},
+  title        = {Eff -- Screaming Fast Extensible Effects for Less},
+  organization = {Hasura},
+  year         = {2020},
+  url          = {https://github.com/hasura/eff/tree/7d7f9ab77f3c7f473d52457e41e9b6e1870d72f6},
+  urldate      = today
+}
+
+@online{ghcdelim,
+  author  = {Alexis King},
+  title   = {Delimited Continuation Primops},
+  year    = {2021},
+  url     = {https://github.com/ghc-proposals/ghc-proposals/blob/master/proposals/0313-delimited-continuation-primops.rst},
+  urldate = today
 }
 
 @manual{optparse,
   author  = {Paolo Capriotti and Huw Campbell},
-  title   = {Optparse-applicative},
-  version = {0.16.1.0},
+  title   = {Optparse-applicative: Utilities and Combinators for Parsing Command Line Options},
+  version = {0.15.1.0},
   year    = {2020},
-  url     = {http://hackage.haskell.org/package/optparse-applicative-0.16.1.0}
+  url     = {http://hackage.haskell.org/package/optparse-applicative-0.15.1.0},
+  urldate = today
+}
+
+@inproceedings{freeapp,
+  author    = {Paolo Capriotti and
+               Ambrus Kaposi},
+  editor    = {Paul Levy and
+               Neel Krishnaswami},
+  title     = {Free Applicative Functors},
+  booktitle = {Proceedings 5th Workshop on Mathematically Structured Functional Programming,
+               \caps{MSFP@ETAPS} 2014, Grenoble, France, 12 April 2014},
+  series    = {\caps{EPTCS}},
+  volume    = {153},
+  pages     = {2--30},
+  year      = {2014},
+  url       = {https://doi.org/10.4204/EPTCS.153.2},
+  doi       = {10.4204/EPTCS.153.2},
+  timestamp = {Wed, 12 Sep 2018 01:05:13 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/CapriottiK14.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
 @manual{megaparsec,
   author  = {{Megaparsec contributors} and Paolo Martini and Daan Leijen},
-  title   = {Megaparsec},
+  title   = {{Megaparsec}: Monadic Parser Combinators},
   version = {9.0.1},
   year    = {2020},
-  url     = {http://hackage.haskell.org/package/megaparsec-9.0.1}
+  url     = {http://hackage.haskell.org/package/megaparsec-9.0.1},
+  urldate = today
 }
 
-@article{parsing,
+@article{parsing-Hutton,
   author    = {Graham Hutton and
                Erik Meijer},
   title     = {Monadic Parsing in {Haskell}},
@@ -488,10 +970,136 @@
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
+@inproceedings{parsing-Swierstra,
+  author    = {S. Doaitse Swierstra},
+  editor    = {Ana Bove and
+               Luís Soares Barbosa and
+               Alberto Pardo and
+               Jorge Sousa Pinto},
+  title     = {Combinator Parsing: A Short Tutorial},
+  booktitle = {Language Engineering and Rigorous Software Development, International
+               LerNet \caps{ALFA} Summer School 2008, Piriapolis, Uruguay, February 24
+               -- March 1, 2008, Revised Tutorial Lectures},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {5520},
+  pages     = {252--300},
+  publisher = {Springer},
+  year      = {2008},
+  url       = {https://doi.org/10.1007/978-3-642-03153-3_6},
+  doi       = {10.1007/978-3-642-03153-3_6},
+  timestamp = {Tue, 14 May 2019 10:00:54 +0200},
+  biburl    = {https://dblp.org/rec/conf/lernet/Swierstra08.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@techreport{parsec,
+  author  = {Leijen, Daan and Meijer, Erik},
+  title   = {Parsec: Direct Style Monadic Parser Combinators for the Real World},
+  year    = {2001},
+  url     = {https://www.microsoft.com/en-us/research/publication/parsec-direct-style-monadic-parser-combinators-for-the-real-world/},
+  edition = {Technical Report \caps{UU-CS}-2001-35, Departement of Computer Science, Universiteit Utrecht},
+  number  = {\caps{UU-CS}-2001-27}
+}
+
 @manual{prettyprinter,
   author  = {Philip Wadler and Daan Leijen and Max Bolingbroke and Edward Kmett and David Luposchainsky},
-  title   = {Prettyprinter},
+  title   = {Prettyprinter: A Modern, Easy to Use, Well-Documented, Extensible Pretty-Printer},
   version = {1.7.0},
   year    = {2020},
-  url     = {http://hackage.haskell.org/package/prettyprinter-1.7.0}
+  url     = {http://hackage.haskell.org/package/prettyprinter-1.7.0},
+  urldate = today
+}
+
+@incollection{prettier,
+  doi       = {10.1007/978-1-349-91518-7_11},
+  url       = {https://doi.org/10.1007%2F978-1-349-91518-7_11},
+  year      = 2003,
+  publisher = {Macmillan Education \caps{UK}},
+  pages     = {223--243},
+  author    = {Philip Wadler},
+  title     = {A Orettier Printer},
+  booktitle = {The Fun of Programming}
+}
+
+@article{with-utf8,
+  author       = {Kirill Elagin},
+  title        = {Haskell with \caps{UTF}-8},
+  version      = {1.0.2.2},
+  organization = {Serokell},
+  year         = {2020},
+  url          = {https://serokell.io/blog/haskell-with-utf8},
+  urldate      = today
+}
+
+@manual{hspec,
+  author  = {Simon Hengel and Trystan Spangler and Greg Weber},
+  title   = {{Hspec}: A Testing Framework for {Haskell}},
+  version = {2.7.8},
+  year    = {2021},
+  url     = {http://hspec.github.io},
+  urldate = today
+}
+
+@manual{hedgehog,
+  author  = {Jacob Stanley},
+  title   = {Hedgehog: Release With Confidence},
+  version = {1.0.5},
+  year    = {2021},
+  url     = {http://hackage.haskell.org/package/hedgehog-1.0.5},
+  urldate = today
+}
+
+@inproceedings{quickcheck,
+  author    = {Koen Claessen and
+               John Hughes},
+  editor    = {Martin Odersky and
+               Philip Wadler},
+  title     = {QuickCheck: A Lightweight Tool for Random Testing of {Haskell} Programs},
+  booktitle = {Proceedings of the Fifth \caps{ACM SIGPLAN} International Conference
+               on Functional Programming (\caps{ICFP} '00), Montreal, Canada, September
+               18--21, 2000},
+  pages     = {268--279},
+  publisher = {\caps{ACM}},
+  year      = {2000},
+  url       = {https://doi.org/10.1145/351240.351266},
+  doi       = {10.1145/351240.351266},
+  timestamp = {Tue, 06 Nov 2018 16:59:25 +0100},
+  biburl    = {https://dblp.org/rec/conf/icfp/ClaessenH00.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{quickcheck-2,
+  author    = {John Hughes},
+  editor    = {Michael Hanus},
+  title     = {QuickCheck Testing for Fun and Profit},
+  booktitle = {Practical Aspects of Declarative Languages, 9th International Symposium,
+               {PADL} 2007, Nice, France, January 14-15, 2007},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {4354},
+  pages     = {1--32},
+  publisher = {Springer},
+  year      = {2007},
+  url       = {https://doi.org/10.1007/978-3-540-69611-7_1},
+  doi       = {10.1007/978-3-540-69611-7_1},
+  timestamp = {Tue, 14 May 2019 10:00:42 +0200},
+  biburl    = {https://dblp.org/rec/conf/padl/Hughes07.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{shrinking,
+  author       = {de Vries, Edsko},
+  title        = {Integrated versus Manual Shrinking},
+  organization = {Well-Typed \caps{LLP}},
+  year         = {2019},
+  url          = {https://www.well-typed.com/blog/2019/05/integrated-shrinking/},
+  urldate      = today
+}
+
+@manual{shorttext,
+  author  = {Herbert Valerio Riedel},
+  title   = {Text-short: Memory-Efficient Representation of Unicode Text Strings},
+  version = {0.1.3},
+  year    = {2021},
+  url     = {http://hackage.haskell.org/package/text-short-0.1.3},
+  urldate = today
 }

@@ -2,6 +2,7 @@ digraph G {
 graph[nodesep=0.2];
 node[shape=none,height=0];
 u0[fillcolor="#bbffbb",style="filled",label="Pirec"];
+u29[fillcolor="#ffffbb",style="filled",label="Pirec.Options"];
 u24[fillcolor="#ffffbb",style="filled",label="Pirec.Unify"];
 u22[fillcolor="#ffffbb",style="filled",label="Pirec.Eval"];
 u20[fillcolor="#ffffbb",style="filled",label="Pirec.Pretty"];
@@ -32,6 +33,7 @@ u12[fillcolor="#77ffff",style="filled",label="Pirec.Var.Meta"];
 u7[fillcolor="#77ffff",style="filled",label="Pirec.Var.Level"];
 u0 -> u14;
 u0 -> u26;
+u0 -> u29;
 u1 -> u2;
 u2 -> u10;
 u4 -> u3;
@@ -70,5 +72,4 @@ u26 -> u27;
 u27 -> u8;
 u27 -> u13;
 u27 -> u28;
-
 }

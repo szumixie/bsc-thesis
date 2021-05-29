@@ -1,20 +1,25 @@
 \chapter{User documentation}\label{ch:userdocs}
 
-Pirec is a dependently typed functional language with row polymorphism and
-extensible records. It can be used to write programs without side effect and
-prove simple theorems. The program is command line tool that can type check and
-interpret Pirec programs.
+Pirec is a functional language with dependent functions, dependent pairs, row
+polymorphism and extensible records. It can be used to write programs without
+side effect and prove simple theorems. The program is command line tool that can
+type check and interpret Pirec programs.
 
 \section{Installation}\label{sec:install}
 
+The program can be installed as follows:
 \begin{enumerate}
-  \item Install Stack~\cite{stack}.
+  \item Install \emph{Stack}~\cite{stack}.
   \item Clone or download the source code repository.
-  \item Enter the repository and run the following:
-        \begin{minted}{sh}
-stack install --flag pirec:release
-        \end{minted}
+  \item Enter the repository and run the following command:
+        \mintinline{text}{stack install}
 \end{enumerate}
+
+(During the compilation of \texttt{Paths\_pirec} module, there will be warning
+about a prepositive qualified module. This is due to a bug in
+\emph{Cabal}'s~\cite{cabal} automatic file generation in combination with the
+warning which is only fixed in a recent pull request to the development version
+of Cabal~\cite{cabal-prepos}.)
 
 \section{Usage}\label{sec:usage}
 
@@ -39,21 +44,28 @@ id (Rec #{}) rec{}
 where \mintinline{pirec.py:PirecLexer -x}{Rec #{}} is the type of empty records
 and \mintinline{pirec.py:PirecLexer -x}{rec{}} is an instance of an empty
 record. These two lines can be put into a file, for example into
-\texttt{id.pirec}, then run \mintinline{sh}{pirec id.pirec}. The
-program will then output the following, prettyprinting the normal form of the
-last line of the input and its inferred type:
+\texttt{id.pirec}, then run \mintinline{text}{pirec id.pirec}. The program will
+then output the following, prettyprinting the normal form of the last line of
+the input and its inferred type:
 \begin{minted}{pirec.py:PirecLexer -x}
 rec{  }
   : Rec #{  }
 \end{minted}
+One can give command line options to the program to modify what to output, for
+example \mintinline{text}{--elab-only} can be given so that the program does not
+evaluate to normal form, instead it only elaborates and infers the type. Run
+\mintinline{text}{pirec --help} to see all options.
 
 Here is another way to define the identity function:
 \begin{minted}{pirec.py:PirecLexer -x}
-id2 : ∀ (A : Type) → A → A = λ _ a → a
+id2 : ∀ (A : Type) → A → A
+    = λ _ a → a
 \end{minted}
 The definition is given a type signature, the lambda binders are grouped
 together with a single lambda and their types are removed since they are
-optional, the unused lambda parameter is ignored with an underscore.
+optional, the unused lambda parameter is ignored with an underscore. The
+definition can also be split across multiple lines, as long as the following
+lines have more indentation than the beginning of the definition
 
 The first parameter can be made into an implicit parameter, and its type is also
 optional:
@@ -64,20 +76,129 @@ With this, the type of the argument does not need to be written out:
 \begin{minted}{pirec.py:PirecLexer -x}
 id3 rec{}
 \end{minted}
-
-Data types can be defined with their Church encoding, for example Booleans:
+Running \mintinline{text}{pirec id3.pirec --elab-only --metas} it outputs the
+following:
 \begin{minted}{pirec.py:PirecLexer -x}
-Bool  : Type = ∀ {A} → A → A → A
-true  : Bool = λ x y → x
-false : Bool = λ x y → y
+let{ id3 = λ {A} a → a; id3 {?1} rec{  } }
+  : Rec #{  }
+Metavariables:
+  ?0 = Type
+  ?1 = Rec #{  }
+\end{minted}
+Here it shows that the implicit argument is elaborated to a metavariable which
+is solved to the correct type.
+
+Data types can be defined with their Church encoding (see \cref{ssec:church}),
+for example the natural numbers:
+\begin{minted}{pirec.py:PirecLexer -x}
+Nat  : Type = ∀ {A} → (A → A) → A → A
+zero : Nat  = λ _ z → z
+suc  : Nat → Nat = λ x s z → s (x s z)
+\end{minted}
+One can then define operators on them like addition and multiplication:
+\begin{minted}{pirec.py:PirecLexer -x}
+add : Nat → Nat → Nat = λ x y s z → x s (y s z)
+mul : Nat → Nat → Nat = λ x y s z → x (y s) z
+\end{minted}
+Then one can evaluate simple arithmetic expressions such as \(1 + 2 * 3\):
+\begin{minted}{pirec.py:PirecLexer -x}
+add (suc zero) (mul (suc (suc zero)) (suc (suc (suc zero))))
+\end{minted}
+Running this will get you the correct Church encoded number:
+\begin{minted}{pirec.py:PirecLexer -x}
+λ {A} s z → s (s (s (s (s (s (s z))))))
+  : ∀ {A : Type} → (A → A) → A → A
 \end{minted}
 
-\section{Errors}
+Records can be created in Pirec, for example:
+\begin{minted}{pirec.py:PirecLexer -x}
+r : Rec #{ x : Nat; y : Nat } = rec{ x = suc zero; y = suc (suc zero) }
+\end{minted}
+Record types are denoted with \mintinline{pirec.py:PirecLexer -x}{Rec}, then
+follows a row, and \mintinline{pirec.py:PirecLexer -x}{#} is the start of a row
+literal, following that are the two fields surrounded by braces which are both
+\mintinline{pirec.py:PirecLexer -x}{Nat} in this case. Record literals are
+denoted with the keyword \mintinline{pirec.py:PirecLexer -x}{rec}, following
+that are the two fields which are given values. Records can be extended and
+projected from, and restricted from:
+\begin{minted}{pirec.py:PirecLexer -x}
+r2 : Rec #{ x : Nat; z : Nat } = rec{ z = suc r.y | r.-y }
+\end{minted}
+Here there is a new \mintinline{pirec.py:PirecLexer -x}{z} field which takes the
+same successor of the \mintinline{pirec.py:PirecLexer -x}{y} field, while the
+original \mintinline{pirec.py:PirecLexer -x}{y} field is removed. Record
+extension is like a literal, but with a pipe and the original record right of
+it. Record projection and restriction are done with a period or
+\mintinline{pirec.py:PirecLexer -x}{.-} followed by the field respectively.
+There is syntactic sugar for modifying a field, which is the same as restricting then extending with the same field:
+\begin{minted}{pirec.py:PirecLexer -x}
+r3 : Rec #{ x : Nat; y : Nat } = rec{ x := zero | r.-x }
+r4 : Rec #{ x : Nat; y : Nat } = rec{ x := zero | r }
+\end{minted}
+The above two records are the same, both have the
+\mintinline{pirec.py:PirecLexer -x}{x} field become zero.
 
-\section{Lexical structure}
+Row polymorphism can be used to manipulate records with unknown fields. For
+example
+\begin{minted}{pirec.py:PirecLexer -x}
+f1 : ∀ {R} → Rec #{ x : Nat | R } → Rec #{ x : Nat | R }
+   = λ r → rec{ suc r.x | r }
+\end{minted}
+is a function that takes any record with an \mintinline{pirec.py:PirecLexer
+  -x}{x} field and modifies it to have the field have its successor. The
+implicit argument \mintinline{pirec.py:PirecLexer -x}{R} is an arbitrary row,
+and pipe is used for row extension similarly to record extension.
 
-Pirec is indentation sensitive, similarly to Haskell.
+The extensible record is based on~\cite{scopedlabels}, so there multiple fields
+can have the same name in the same row and record. For example
+\begin{minted}{pirec.py:PirecLexer -x}
+r5 : Rec #{ x : Nat; x : Nat } = rec{ x = suc zero; x = suc (suc zero) }
+\end{minted}
+is valid. Note that the order of fields with the matter when the name of the
+fields are the same, in this case, projection and restriction only work on the
+left most field of that name. To get a field which is not the left most, one can first restrict then project, like so:
+\begin{minted}{pirec.py:PirecLexer -x}
+r5.-x.x
+\end{minted}
 
+One can use dependent products and records to create a sort of list type. It is defined as follows:
+\begin{minted}{pirec.py:PirecLexer -x}
+List = λ A → ∃ (x : Nat) ×
+               let z = #{}
+                   s = λ (R : Row Type) → #{ e : A | R }
+                   x s z
+\end{minted}
+It is a type for dependent pairs with a natural number, and a record with that
+amount of fields all named \mintinline{pirec.py:PirecLexer -x}{e}. The dependent
+product type is denoted similarly to the dependent function type, except that
+\mintinline{pirec.py:PirecLexer -x}{∃} and \mintinline{pirec.py:PirecLexer
+  -x}{×} are used instead. Right of the times sign, a let expression is used,
+local definitions can be given with it with the last line as the return value.
+The definitions and the return value must align, but there is an alternative
+syntax, and can be like so:
+\begin{minted}{pirec.py:PirecLexer -x}
+List = λ A → ∃ (x : Nat) ×
+               let{ z = #{}
+                  ; s = λ (R : Row Type) → #{ e : A | R }
+                  ; x s z }
+\end{minted}
+One might notice that the syntax of braces and semicolons is similar rows and
+records. In fact, rows and records can also be defined without them. For example
+here is an element of the \mintinline{pirec.py:PirecLexer -x}{List} type:
+\begin{minted}{pirec.py:PirecLexer -x}
+l : List Nat = suc (suc (suc zero)) ,
+               rec e = zero
+                   e = suc zero
+                   e = suc (suc zero)
+\end{minted}
+The constructor of dependent pair is denoted with a comma.
+\mintinline{pirec.py:PirecLexer -x}{Row} is the type of rows which can take any
+type, but to use it with records it can only be \mintinline{pirec.py:PirecLexer
+  -x}{Type}.
+
+Every Unicode character shown has an \caps{ASCII} alternative which can be used instead, the correspondences are shown in \cref{tab:ascii}.
+
+\newcommand\pirecampersand{\mintinline{pirec.py:PirecLexer -x}{&}}
 \begin{table}
   \centering
   \begin{tabular}{@{}cc@{}}
@@ -94,16 +215,306 @@ Pirec is indentation sensitive, similarly to Haskell.
     \mintinline{pirec.py:PirecLexer -x}{λ}
             &
     \mintinline{pirec.py:PirecLexer -x}{\ }
+    \\
+    \mintinline{pirec.py:PirecLexer -x}{×}
+            &
+    \pirecampersand{}
+    \\
+    \mintinline{pirec.py:PirecLexer -x}{∃}
+            &
+    \mintinline{pirec.py:PirecLexer -x}{exists}
     \\\bottomrule
   \end{tabular}
   \caption{\caps{ASCII} alternatives to Unicode syntax}\label{tab:ascii}
 \end{table}
 
-\section{Syntax}
+\section{Errors}\label{sec:errors}
 
+\begin{figure}
+  \begin{minted}{text}
+examples/thousand.pirec:2:12:
+  |
+2 | y : Type = something x
+  |            ^^^^^^^^^
+variable something out of scope
+  \end{minted}
+  \caption{An example error}\label{fig:error-ex}
+\end{figure}
+
+Pirec can report many kinds of errors when given a program, it will also report
+the position of the error in a visual way (see \cref{fig:error-ex}). The
+following is a list of possible errors:
+\begin{itemize}
+  \item \begin{minted}{text}
+pirec: ...: openFile: does not exist (No such file or directory)
+        \end{minted}
+        The file given in the command line argument does not exist.
+
+  \item \begin{minted}{text}
+unexpected ...
+        \end{minted}
+        A parse error when the parser was expecting some other token.
+
+  \item \begin{minted}{text}
+incorrect indentation ...
+        \end{minted}
+        A parse error when some token is at an incorrect indentation level. Due
+        to the way parsing is implemented, sometimes this error occurs when an
+        expression suddenly ends when it should not have.
+
+  \item \begin{minted}{text}
+variable ... out of scope
+        \end{minted}
+        A variable is referenced when there is no such variable in the current
+        scope.
+
+  \item \begin{minted}{text}
+got ... application when ... application was expected
+        \end{minted}
+        An implicit argument was given to a function with explicit parameter or
+        the other way around, and the program could not insert an implicit
+        argument.
+
+  \item \begin{minted}{text}
+expected type:
+  ...
+but got inferred type:
+  ...
+        \end{minted}
+        Could not match expected type and inferred type when unifying two types.
+
+  \item \begin{minted}{text}
+variable ... not in scope when solving ...
+        \end{minted}
+        A metavariable could not be solved due to the solution requiring a
+        variable outside of the scope of the metavariable.
+
+  \item \begin{minted}{text}
+occurs check failed when solving ...
+        \end{minted}
+        A metavariable could not be solved due to the solution depending on that
+        same metavariable.
+
+  \item \begin{minted}{text}
+ambiguous hole due to multiple instances of variable ... in the context
+        \end{minted}
+        A metavariable could not be solved due to it depending on the same
+        variable more than once, so there might not be a unique solution.
+
+  \item \begin{minted}{text}
+got nonvariable in the context: ...
+        \end{minted}
+        A metavariable could not be solved due to it depending on something
+        which is not a variable.
+
+  \item \begin{minted}{text}
+got non-invertable spine
+        \end{minted}
+        A metavariable could not be solved due to it being in a spine which is
+        not made up of solely function applications.
+
+  \item \begin{minted}{text}
+pirec: bug
+        \end{minted}
+        A bug occurred in the program which is not supposed to happen, an issue
+        can be opened in the GitHub repository.
+\end{itemize}
+
+\section{Lexical structure}\label{sec:lex}
+
+\caps{EBNF} as specified by \caps{ISO}~\cite{isoebnf} is used to describe the
+lexical structure in this section.
+
+Pirec is an indentation sensitive language utilising the off-side rule, like
+Haskell~\cite{haskell2010}, Agda~\cite{agda}, and Python~\cite{python}. The
+control characters \controlchar{t}, \controlchar{r}, \controlchar{f},
+\controlchar{v} and all Unicode space characters are considered white space
+characters and are ignored except for delimiting tokens and counting towards
+indentation levels. Each space character counts as one indentation level except
+for tab (\controlchar{t}) which counts as 8. The newline character
+(\controlchar{n}) is also considered white space, but it resets the indentation
+level to zero.
+
+Line comments start with \texttt{--} and ends at a newline, block comments are
+surrounded by \texttt{\{-} and \texttt{-\}}, they are ignored by the parser.
+Block comments can be nested and does not need to be closed if it ends at the
+end of the file.
+
+The syntax contains nested \emph{blocks}, each block contains \emph{lines}, the
+keywords \mintinline{pirec.py:PirecLexer -x}{let},
+\mintinline{pirec.py:PirecLexer -x}{#}, and \mintinline{pirec.py:PirecLexer
+  -x}{rec} start a new block. The block can be denoted by indendation, or
+alternatively it can be surrounded by braces after the block starting keyword
+and lines can be separated by semicolons to have the particular block be
+indentation insensitive. To denote a block with indentation, each line inside
+the block needs to be more indented than the enclosing block and be at the same
+indentation as each other, the end of the block happens before decreased
+indentation.
 \begin{minted}{ebnf}
-atom = identifier | "_"
+block_begin = ? either "{" or increased indentation
+                matching with the corresponding block tokens ? ;
+block_end   = ? either "}" with optional ";" before it
+                or decreased indentation matching
+                with the corresponding block tokens ? ;
+block_sep   = ? either ";" or the same indentation
+                matching with the corresponding block tokens ? ;
 \end{minted}
+
+A line in a block can be split across multiple lines and still be parsed as the
+same thing, to do this, each token after the first one in the line needs to be
+more indented than the enclosing block, and the token at the end of a line break
+cannot be a block starting keyword.
+
+Identifiers can consist of any character in the Letter, Mark, Number,
+Punctuation, or Symbol category of Unicode, except for some characters in
+\caps{ASCII}: parentheses, braces, semicolons, backslashes, periods, and double
+quotes.
+\begin{minted}{ebnf}
+special_char = "(" | ")" | "{" | "}" | ";" | "\" | "." | '"' ;
+ident_char   = ? any character not in the Separator
+                 or Other category of Unicode ? - special_char ;
+\end{minted}
+Identifiers must not be keywords, binders can have underscore in place of
+identifiers, string literals can be used to denote field labels when it cannot
+be written as an identifier.
+\begin{minted}{ebnf}
+keyword      = "_" | "let" | "=" | ":" | "Type"
+             | "→" | "->" | "∀" | "forall" | "λ"
+             | "×" | "&" | "∃" | "exists" | "," | "proj1" | "proj2"
+             | "Row" | "#" | "|" | "Rec" | "rec" | ":=" ;
+ident        = { ident_char } - keyword ;
+binder_ident = ident | "_" ;
+field_label  = ident | ? string literal enclosed with " ? ;
+\end{minted}
+Each Unicode token has an \caps{ASCII} alternative which can be used instead
+(see \cref{tab:ascii}).
+\begin{minted}{ebnf}
+arrow  = "→" | "->" ;
+forall = "∀" | "forall" ;
+lambda = "λ" | "\" ;
+times  = "×" | "&" ;
+exists = "∃" | "exists" ;
+\end{minted}
+
+\section{Syntax}\label{sec:syntax}
+
+The program as a whole is a let block without the starting
+\mintinline{pirec.py:PirecLexer -x}{let} token, which will be describe further
+below.
+\begin{minted}{ebnf}
+program = let_block ;
+\end{minted}
+
+Expressions can consist of many operators with differing precendence and fixity
+(see \cref{tab:ops}), function application can be considered as an operator
+denoted by juxtaposition, the argument can be denoted as implicit with braces.
+The keywords \mintinline{pirec.py:PirecLexer -x}{proj1},
+\mintinline{pirec.py:PirecLexer -x}{proj2}, \mintinline{pirec.py:PirecLexer
+  -x}{Row}, and \mintinline{pirec.py:PirecLexer -x}{Rec} act like functions that
+must be applied to an argument.
+\begin{minted}{ebnf}
+expr       = times_expr | times_expr , arrow , expr ;
+times_expr = comma_expr | comma_expr , times , times_expr ;
+comma_expr = app_expr | app_expr , "," , comma_expr ;
+app_expr   = proj_expr | app_expr , proj_expr | app_expr , "{" proj_expr "}"
+           | ( "proj1" | "proj2" | "Row" | "Rec" ) , proj_expr ;
+proj_expr  = atom | proj_expr , ( "." | ".-" ) , field_label ;
+\end{minted}
+
+\begin{table}
+  \centering
+  \begin{tabular}{@{}cc@{}}
+    \toprule
+    Operator & Fixity \\\midrule
+    \mintinline{pirec.py:PirecLexer -x}{.} and
+    \mintinline{pirec.py:PirecLexer -x}{.-}
+             & Left
+    \\
+    function application
+             & Left
+    \\
+    \mintinline{pirec.py:PirecLexer -x}{,}
+             & Right
+    \\
+    \mintinline{pirec.py:PirecLexer -x}{×}
+             & Right
+    \\
+    \mintinline{pirec.py:PirecLexer -x}{→}
+             & Right
+    \\\bottomrule
+  \end{tabular}
+  \caption[Pirec operators and their fixity sorted by their precedence]{Pirec
+    operators and their fixity ordered by their precedence (from highest to
+    lowest precedence)}\label{tab:ops}
+\end{table}
+
+The atomic expressions starting with \mintinline{pirec.py:PirecLexer -x}{let},
+\mintinline{pirec.py:PirecLexer -x}{∀}, \mintinline{pirec.py:PirecLexer -x}{λ},
+\mintinline{pirec.py:PirecLexer -x}{∃}, \mintinline{pirec.py:PirecLexer -x}{#},
+or \mintinline{pirec.py:PirecLexer -x}{rec} when they do not have a delimiter at
+the right side can lead to ambiguous grammar, hence there is an extra rule which
+says that those expressions extend as far to the right as possible. The same
+method is used in \caps{GHC}'s BlockArguments language extension~\cite{ghc,
+  blockargs}.
+\begin{minted}{ebnf}
+atom = "(" , expr , ")" | ident | "_" | let_expr | "Type"
+     | pi_expr | lam_expr | sigma_expr | row_expr | rec_expr ;
+\end{minted}
+
+Let expressions start with a \mintinline{pirec.py:PirecLexer -x}{let} keyword
+and it starts a \emph{let block}. Each line of the block is a definition with
+optional types, the last line is a single term which is the result.
+\begin{minted}{ebnf}
+let_expr  = "let" , let_block ;
+let_block = block_begin , { let_def , block_sep } , expr , block_end ;
+let_def   = binder_ident , [ ":" , expr ] , "=" , expr ;
+\end{minted}
+
+The syntax of dependent function types and lambda abstractions are similar, the
+only difference is the starting keyword. They can have multiple parameter
+binders, each one is an identifier, or it can be surrounded with parentheses
+then given a type, or braces to denote it as an implict argument.
+\begin{minted}{ebnf}
+pi_expr      = forall , fun_binder , { fun_binder } , arrow , expr ;
+lam_expr     = lambda , fun_binder , { fun_binder } , arrow , expr ;
+fun_binder   = binder_ident | "(" , binder_ident , [ ":" , expr ] , ")"
+                            | "{" , binder_ident , [ ":" , expr ] , "}" ;
+\end{minted}
+
+Dependent pairs are similar in syntax to dependent functions, except for using
+\mintinline{pirec.py:PirecLexer -x}{∃} and \mintinline{pirec.py:PirecLexer
+  -x}{×}, and not allowing implicit binders.
+\begin{minted}{ebnf}
+sigma_expr = exists , sigma_binder , { sigma_binder } , times , times_expr ;
+sigma_binder = binder_ident | "(" , binder_ident , [ ":" , expr ] , ")" ;
+\end{minted}
+
+Rows literals start with a hash character, and starts a block. The block can be
+empty, or it can contain fields, which can be an extension to another row
+denoted by a pipe character.
+\begin{minted}{ebnf}
+row_expr   = "#" , block_begin , [ row_fields ] , block_end ;
+row_fields = { row_field , block_sep } , row_field , [ row_ext ] ;
+row_field  = field_label , ":" , expr ;
+row_ext    = [ block_sep ] , "|" , expr ;
+\end{minted}
+
+Record literals have a similar structure to row literals, the extension is the
+same. However, record fields are defined with the equals sign, or with
+\mintinline{pirec.py:PirecLexer -x}{:=} for updating the content of a field,
+they can also be annotated with optional types. Besides these, a record field
+can just be a single identifier, which is syntactic sugar for defining it to be
+a variable with the same name.
+\begin{minted}{ebnf}
+rec_expr   = "rec" , block_begin , [ rec_fields ] , block_end ;
+rec_fields = { rec_field , block_sep } , rec_field , [ row_ext ] ;
+rec_field  = ident | field_label , [ ":" , expr ] , ( "=" | ":=" ) , expr ;
+\end{minted}
+
+Some of the syntax is syntactic sugar, which will be desugared after parsing to
+get a simpler \caps{AST} (see \cref{fig:sugar,fig:term}, optional typing and
+implicit arguments are not shown but they work analogously to their
+counterparts).
 
 \begin{figure}
   \begin{align*}
@@ -118,6 +529,10 @@ atom = identifier | "_"
     \lambda x_1 \dots x_n \to B
      & \quad\mapsto\quad
     \lambda x_1 \to \dots \lambda x_n \to B
+    \\
+    \exists (x_1 : A_1) \dots (x_n : A_n) \times B
+     & \quad\mapsto\quad
+    \exists (x_1 : A_1) \times \dots \forall (x_n : A_n) \times B
     \\
     \# \{ l_1 : t_1;\ \dots;\ l_n : t_n \}
      & \quad\mapsto\quad
@@ -137,11 +552,13 @@ atom = identifier | "_"
     \RecordLit \{ l_1 = t_1 \mid \dots
     \RecordLit \{ l_n = t_n \mid u \} \dots \}
     \\
-    \RecordLit \{ l_1 \coleqq t_1;\ \dots;\ l_n \coleqq t_n \mid u \}
+    \RecordLit \{ l \coleqq t \mid u \}
      & \quad\mapsto\quad
-    \RecordLit \{ l_1 \coleqq t_1 \mid \dots
-    \RecordLit \{ l_n \coleqq t_n \mid u \RecordRestr l_n \}
-    \dots \RecordRestr l_1 \}
+    \RecordLit \{ l \coleqq t \mid u \RecordRestr l \}
+    \\
+    \RecordLit \{ l \mid u \}
+     & \quad\mapsto\quad
+    \RecordLit \{ l = l \mid u \}
   \end{align*}
   \caption{Syntactic sugar in Pirec}\label{fig:sugar}
 \end{figure}
@@ -175,6 +592,22 @@ atom = identifier | "_"
     \mid{}
      & t\ u
      & \qquad\text{function application}
+    \\
+    \mid{}
+     & \exists (x : A) \times B
+     & \qquad\text{dependent pair}
+    \\
+    \mid{}
+     & t, u
+     & \qquad\text{pair constructor}
+    \\
+    \mid{}
+     & {\ProjOne t}
+     & \qquad\text{first projection}
+    \\
+    \mid{}
+     & {\ProjTwo t}
+     & \qquad\text{second projection}
     \\
     \mid{}
      & {\RowType A}
@@ -211,12 +644,11 @@ atom = identifier | "_"
   \caption{The desugared terms of Pirec}\label{fig:term}
 \end{figure}
 
-\section{Type system}
+\section{Type system and Semantics}\label{sec:typesem}
 
-The typing rules of Pirec are presented in \cref{fig:typing} without implicit
-arguments.
-
-~\cite{scopedlabels}
+The typing rules of Pirec are presented in \cref{fig:typing}, some equalities in
+for typing are shown in \cref{fig:equality}, holes and unannotated binders will
+have metavariables inserted, then the program will try to solve them.
 
 \begin{figure}
   \begin{gather*}
@@ -250,6 +682,40 @@ arguments.
       \hypo{\Gamma \vdash t : \forall (x : A) \to B}
       \hypo{\Gamma \vdash u : A}
       \infer2{\Gamma \vdash t\ u : B[x \coleqq u]}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{\Gamma \vdash A : \Univ}
+      \hypo{\Gamma,\ x : A \vdash B : \Univ}
+      \infer2{\Gamma \vdash \exists (x : A) \times B : \Univ}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : A}
+      \hypo{\Gamma \vdash u : B}
+      \infer2{\Gamma \vdash t, u : \exists (x : A) \times B}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{\Gamma \vdash A : \Univ}
+      \hypo{\Gamma,\ x : A \vdash B : \Univ}
+      \infer2{\Gamma \vdash \exists (x : A) \times B : \Univ}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : A}
+      \hypo{\Gamma \vdash u : B[x \coleqq t]}
+      \infer2{\Gamma \vdash t, u : \exists (x : A) \times B}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : \exists (x : A) \times B}
+      \infer1{\Gamma \vdash \ProjOne t : A}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{\Gamma \vdash t : \exists (x : A) \times B}
+      \infer1{\Gamma \vdash \ProjTwo t : B[x \coleqq \ProjOne t]}
     \end{prooftree}
     \\
     \begin{prooftree}
@@ -296,8 +762,77 @@ arguments.
   \caption{The typing rules of Pirec}\label{fig:typing}
 \end{figure}
 
-\section{Semantics}
-\Cref{fig:big-step}
+\begin{figure}
+  \begin{gather*}
+    \begin{prooftree}
+      \infer0{(\lambda x \to t)\ u \equiv t[x \coleqq u]}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \infer0{(\lambda x \to t\ x) \equiv t}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \infer0{\ProjOne (t, u) \equiv t}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \infer0{\ProjTwo (t, u) \equiv u}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \infer0{(\ProjOne t, \ProjTwo t) \equiv t}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{l \neq l'}
+      \infer1{\# \{ l = t \mid \# \{ l' = u \mid r \} \}
+        \equiv \# \{ l' = u \mid \# \{ l = t \mid r \} \}}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{l \neq l'}
+      \infer1{\RecordLit \{ l = t \mid \RecordLit \{ l' = u \mid v \} \}
+        \equiv \RecordLit \{ l' = u \mid \RecordLit \{ l = t \mid v \} \}}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \infer0{\RecordLit \{ l = t \mid u \}.l \equiv t}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{l \neq l'}
+      \infer1{\RecordLit \{ l' = t \mid u \}.l \equiv u.l}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \infer0{\RecordLit \{ l_1 = t.l_1; \dots; l_n = t.l_n \} \equiv t}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \infer0{\RecordLit \{ l = t \mid u \} \RecordRestr l \equiv u }
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{l \neq l'}
+      \infer1{\RecordLit \{ l' = t \mid u \} \RecordRestr l \equiv
+        \RecordLit \{ l' = t \mid u \RecordRestr l \}}
+    \end{prooftree}
+  \end{gather*}
+  \caption{Non-trivial equality rules in Pirec}\label{fig:equality}
+\end{figure}
+
+The row polymorphism and extensible record implementation is based
+on~\cite{scopedlabels}, so rows and records can contain multiple fields, and the
+most recently extended field \enquote{shadows} but does not remove fields with
+the same name, shadowed fields are still accessible by removing the fields
+\enquote{on top} of them. Fields with different labels are still unordered
+relative to one another.
+
+The evaluation requires the definition of neutral terms, which are terms with a
+variable and actions on that variable that cannot proceed due to it being a
+variable. It is shown in \cref{fig:neutral}. The big-step operational semantics
+of evaluating Pirec terms to normal form is defined in \Cref{fig:big-step}.
 
 \begin{figure}
   \begin{alignat*}{2}
@@ -305,6 +840,10 @@ arguments.
                 & \qquad\text{variable}             \\
     \mid{}      & n\ t
                 & \qquad\text{function application} \\
+    \mid{}      & {\ProjOne n}
+                & \qquad\text{first projection}     \\
+    \mid{}      & {\ProjTwo n}
+                & \qquad\text{second projection}    \\
     \mid{}      & \# \{ l : t \mid n \}
                 & \qquad\text{row extension}        \\
     \mid{}      & {\RecordLit \{ l = t \mid n \}}
@@ -353,6 +892,38 @@ arguments.
       \hypo{t \Downarrow n}
       \hypo{u \Downarrow u'}
       \infer2{t\ u \Downarrow n\ u'}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{A \Downarrow A'}
+      \hypo{B \Downarrow B'}
+      \infer2{\exists (x : A) \times B \Downarrow \exists (x : A') \times B'}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow t'}
+      \hypo{u \Downarrow u'}
+      \infer2{t, u \Downarrow t', u'}
+    \end{prooftree}
+    \\
+    \begin{prooftree}
+      \hypo{t \Downarrow u, v}
+      \infer1{\ProjOne t \Downarrow u}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow n}
+      \infer1{\ProjOne t \Downarrow \ProjOne n}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow u, v}
+      \infer1{\ProjTwo t \Downarrow v}
+    \end{prooftree}
+    \qquad
+    \begin{prooftree}
+      \hypo{t \Downarrow n}
+      \infer1{\ProjTwo t \Downarrow \ProjTwo n}
     \end{prooftree}
     \\
     \begin{prooftree}

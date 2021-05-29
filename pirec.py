@@ -1,5 +1,3 @@
-import re
-
 from pygments.lexer import RegexLexer
 from pygments.token import Text, Keyword, Name, String, Operator, Punctuation, Comment
 from pygments.lexers.haskell import HaskellLexer
@@ -22,8 +20,11 @@ class PirecLexer(RegexLexer):
             (r"\\", Keyword.Reserved),
             (r"\.-?", Operator),
             (r'"', String, "string"),
-            (fr"(=|:|→|->|\||:=)(?!{identChar})", Operator.Word),
-            (fr"(_|let|∀|forall|λ|#|rec)(?!{identChar})", Keyword.Reserved),
+            (fr"(=|:|→|->|×|&|,|\||:=)(?!{identChar})", Operator.Word),
+            (
+                fr"(_|let|∀|forall|λ|∃|exists|proj1|proj2|#|rec)(?!{identChar})",
+                Keyword.Reserved,
+            ),
             (fr"(Type|Row|Rec)(?!{identChar})", Keyword.Type),
             (fr"{identChar}+", Name),
         ],

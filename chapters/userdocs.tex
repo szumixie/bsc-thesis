@@ -132,7 +132,7 @@ it. Record projection and restriction are done with a period or
 \mintinline{pirec.py:PirecLexer -x}{.-} followed by the field respectively.
 There is syntactic sugar for modifying a field, which is the same as restricting then extending with the same field:
 \begin{minted}{pirec.py:PirecLexer -x}
-r3 : Rec #{ x : Nat; y : Nat } = rec{ x := zero | r.-x }
+r3 : Rec #{ x : Nat; y : Nat } = rec{ x = zero | r.-x }
 r4 : Rec #{ x : Nat; y : Nat } = rec{ x := zero | r }
 \end{minted}
 The above two records are the same, both have the
@@ -554,7 +554,7 @@ counterparts).
     \\
     \RecordLit \{ l \coleqq t \mid u \}
      & \quad\mapsto\quad
-    \RecordLit \{ l \coleqq t \mid u \RecordRestr l \}
+    \RecordLit \{ l = t \mid u \RecordRestr l \}
     \\
     \RecordLit \{ l \mid u \}
      & \quad\mapsto\quad
